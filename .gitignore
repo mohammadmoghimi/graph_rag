@@ -1,0 +1,60 @@
+##############################
+# BACKEND (Django)
+##############################
+# Virtual environment
+backend/venv/
+backend/.venv/
+
+# SQLite Database (if you keep it in backend/)
+backend/db.sqlite3
+*.sqlite3
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Django local settings (if you create a local.py)
+backend/local_settings.py
+
+# Collected static files
+backend/staticfiles/
+backend/media/
+
+##############################
+# FRONTEND (React / Vue / Angular)
+##############################
+# Node.js dependencies (HUGE - must ignore)
+frontend/node_modules/
+frontend/.pnp/
+frontend/.pnp.js
+
+# Build output (generated code)
+frontend/dist/
+frontend/build/
+frontend/out/
+
+# Frontend environment variables
+frontend/.env
+frontend/.env.local
+
+##############################
+# GENERAL (Shared)
+##############################
+# Environment variables (API keys, secrets)
+.env
+.env.local
+
+# IDE settings
+.vscode/
+.idea/
+*.iml
+
+# OS junk files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
