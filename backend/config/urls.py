@@ -9,4 +9,5 @@ urlpatterns = [
     path("api/auth/login/", TokenObtainPairView.as_view()),
     path("api/auth/refresh/", TokenRefreshView.as_view()),
     path("api/auth/me/", CurrentUserView.as_view()),
+    path("api/chats/", include("chat.urls")),
 ]
