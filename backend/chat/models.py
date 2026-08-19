@@ -24,11 +24,13 @@ class ChatSession(models.Model):
 class ChatSessionWebsite(models.Model):
     chat_session = models.ForeignKey(
         ChatSession,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="chat_websites"
     )
     website = models.ForeignKey(
         Website,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name="chat_sessions"
     )
 
     class Meta:
