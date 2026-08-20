@@ -16,7 +16,7 @@ export interface Website {
 @Injectable({
   providedIn: 'root',
 })
-export class Website {
+export class WebsiteService {
     private apiUrl = 'http://127.0.0.1:8000/api/websites';
 
   constructor(private http: HttpClient) {}

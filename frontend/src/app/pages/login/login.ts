@@ -28,7 +28,7 @@ export class Login {
       this.password
     ).subscribe({
       next: () => {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/']);
       },
       error: () => {
         this.errorMessage = 'Invalid username or password.';

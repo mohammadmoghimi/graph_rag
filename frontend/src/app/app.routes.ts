@@ -11,18 +11,13 @@ export const routes: Routes = [
     component: Login
   },
   {
-    path: 'dashboard',
-    component: Dashboard,
-    canActivate: [authGuard]
-  },
-  {
-  path: 'websites',
-  component: Websites,
-  canActivate: [authGuard]
-  },
-  {
     path: '',
-    redirectTo: 'login',
-    pathMatch: 'full'
-  }
+    loadChildren: () =>
+      import('./pages/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
+    canActivate: [authGuard],
+  },
+  {
+    path: '**',
+    redirectTo: '',
+  },
 ];

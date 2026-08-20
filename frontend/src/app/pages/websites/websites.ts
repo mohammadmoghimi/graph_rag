@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Website } from '../../services/website';
+import { Website, WebsiteService } from '../../services/website';
 import { RouterOutlet } from "@angular/router";
 
 @Component({
@@ -22,7 +22,7 @@ export class Websites implements OnInit {
   loading = false;
 
   constructor(
-    private websiteService: Website
+    private websiteService: WebsiteService
   ) {}
 
   ngOnInit() {
