@@ -1,0 +1,19 @@
+from .crawler import crawl_website
+from .chunker import split_into_chunks
+
+
+def crawl_and_chunk(url, max_pages=5):
+    documents = crawl_website(
+        url,
+        max_pages=max_pages
+    )
+
+    if not documents:
+        raise ValueError("No pages were crawled.")
+
+    chunks = split_into_chunks(documents)
+
+    if not chunks:
+        raise ValueError("No chunks were created.")
+
+    return documents, chunks

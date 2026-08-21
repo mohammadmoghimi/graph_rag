@@ -2,11 +2,11 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import action
-
+from knowledge.services import process_website
 from users.permissions import IsAdmin
 from .models import Crawl, Website
 from .serializers import CrawlSerializer, WebsiteSerializer
-
+from rest_framework import status
 
 class WebsiteViewSet(viewsets.ModelViewSet):
     serializer_class = WebsiteSerializer
@@ -33,11 +33,25 @@ class WebsiteViewSet(viewsets.ModelViewSet):
             status="running"
         )
 
+        try:
+            documents, chunks = process_website(website, crawl)
+
+        except Exception as e:
+            crawl.status = "failed"
+            crawl.error_message = str(e)
+            crawl.save()
+
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
         return Response(
             {
                 "website": WebsiteSerializer(website).data,
                 "crawl": CrawlSerializer(crawl).data
             },
+            status=status.HTTP_201_CREATED
         )
     
     @action(detail=True, methods=["get"])

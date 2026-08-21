@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "users",
     "websites",
     "chat",
+    "knowledge",
 ]
 
 MIDDLEWARE = [
