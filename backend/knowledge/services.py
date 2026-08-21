@@ -11,6 +11,8 @@ def process_website(website, crawl):
     try:
         documents, chunks = crawl_and_chunk(
             website.url,
+            website.id,
+            crawl.id,
             max_pages=5
         )
 
@@ -35,3 +37,4 @@ def process_website(website, crawl):
         crawl.save()
 
         raise
+
