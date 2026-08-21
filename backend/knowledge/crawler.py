@@ -95,7 +95,8 @@ def crawl_website(
     delay=0.5,
     timeout=10,
     max_retries=2,
-    user_agent="Mozilla/5.0"
+    user_agent="Mozilla/5.0",
+    page_timeout=None,
 ):
     start_url = normalize_url(start_url)
     domain = urlparse(start_url).netloc
@@ -106,7 +107,11 @@ def crawl_website(
     queue = [start_url]
     documents = []
 
+    if page_timeout is None:
+        page_timeout = timeout + delay + 5  
+
     print(f"Starting crawl of {start_url} (max {max_pages} pages)")
+    print(f"Per‑page timeout: {page_timeout} seconds")
 
     with ThreadPoolExecutor(max_workers=concurrent_workers) as executor:
 
@@ -131,7 +136,14 @@ def crawl_website(
                 url = futures[future]
                 visited.add(url)
 
-                document, links = future.result()
+                try:
+                    document, links = future.result(timeout=page_timeout)
+                except TimeoutError:
+                    print(f"Page {url} timed out after {page_timeout}s")
+                    continue
+                except Exception as exc:
+                    print(f"Page {url} raised an unexpected error: {exc}")
+                    continue
 
                 if document:
                     documents.append(document)
