@@ -22,7 +22,7 @@
     <div class="card-body">
 
       <h5 class="card-title">
-        Add Website
+        Crawl Website
       </h5>
 
       <form (ngSubmit)="addWebsite()">
@@ -74,7 +74,7 @@
           class="btn btn-primary"
           [disabled]="loading"
         >
-          {{ loading ? 'Adding...' : 'Add Website' }}
+          {{ loading ? 'Crawling...' : 'Crawl Website' }}
         </button>
 
       </form>
@@ -128,7 +128,7 @@
             <div>
             <button
                 class="btn btn-sm btn-primary me-2"
-                (click)="crawlWebsite(website.id)"
+                /* (click)="crawlWebsite(website.id)" */
                 [disabled]="website.status === 'pending' || website.status === 'crawling'"
             >
                 Crawl

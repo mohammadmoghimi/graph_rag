@@ -21,21 +21,23 @@ class WebsiteViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @action(detail=True, methods=["post"])
-    def crawl(self, request, pk=None):
-        website = self.get_object()
+    @action(detail=False, methods=["post"], url_path="crawl")
+    def crawl(self, request):
+        serializer = WebsiteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        website = serializer.save(user=request.user)
 
         crawl = Crawl.objects.create(
             website=website,
-            status="pending"
+            status="running"
         )
 
-        website.status = "pending"
-        website.save(update_fields=["status"])
-
         return Response(
-            CrawlSerializer(crawl).data,
-            status=201
+            {
+                "website": WebsiteSerializer(website).data,
+                "crawl": CrawlSerializer(crawl).data
+            },
         )
     
     @action(detail=True, methods=["get"])

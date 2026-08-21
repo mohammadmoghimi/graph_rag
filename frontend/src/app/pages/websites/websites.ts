@@ -2,15 +2,17 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Website, WebsiteService } from '../../services/website';
-import { RouterOutlet } from "@angular/router";
 
 @Component({
   selector: 'app-websites',
-  imports: [CommonModule, FormsModule, RouterOutlet],
+  imports: [CommonModule, FormsModule],
   templateUrl: './websites.html',
   styleUrl: './websites.scss',
 })
 export class Websites implements OnInit {
+addWebsite() {
+throw new Error('Method not implemented.');
+}
   websites: Website[] = [];
 
   name = '';
@@ -40,33 +42,33 @@ export class Websites implements OnInit {
     });
   }
 
-  addWebsite() {
-    this.errorMessage = '';
-    this.successMessage = '';
+  // crawlWebsite() {
+  //   this.errorMessage = '';
+  //   this.successMessage = '';
 
-    this.loading = true;
+  //   this.loading = true;
 
-    this.websiteService.createWebsite(
-      this.name,
-      this.url,
-      this.description
-    ).subscribe({
-      next: website => {
-        this.websites.push(website);
+  //   this.websiteService.createWebsite(
+  //     this.name,
+  //     this.url,
+  //     this.description
+  //   ).subscribe({
+  //     next: website => {
+  //       this.websites.push(website);
 
-        this.name = '';
-        this.url = '';
-        this.description = '';
+  //       this.name = '';
+  //       this.url = '';
+  //       this.description = '';
 
-        this.successMessage = 'Website added successfully.';
-        this.loading = false;
-      },
-      error: () => {
-        this.errorMessage = 'Could not add website.';
-        this.loading = false;
-      }
-    });
-  }
+  //       this.successMessage = 'Website added successfully.';
+  //       this.loading = false;
+  //     },
+  //     error: () => {
+  //       this.errorMessage = 'Could not add website.';
+  //       this.loading = false;
+  //     }
+  //   });
+  // }
 
   deleteWebsite(id: number) {
     this.websiteService.deleteWebsite(id).subscribe({
@@ -81,20 +83,20 @@ export class Websites implements OnInit {
     });
   }
 
-  crawlWebsite(id: number) {
-  this.websiteService.crawlWebsite(id).subscribe({
-    next: () => {
-      const website = this.websites.find(
-        website => website.id === id
-      );
+//   crawlWebsite(id: number) {
+//   this.websiteService.crawlWebsite(id).subscribe({
+//     next: () => {
+//       const website = this.websites.find(
+//         website => website.id === id
+//       );
 
-      if (website) {
-        website.status = 'pending';
-      }
-    },
-    error: () => {
-      this.errorMessage = 'Could not start crawl.';
-    }
-  });
-}
+//       if (website) {
+//         website.status = 'pending';
+//       }
+//     },
+//     error: () => {
+//       this.errorMessage = 'Could not start crawl.';
+//     }
+//   });
+// }
 }
