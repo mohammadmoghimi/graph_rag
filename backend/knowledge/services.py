@@ -3,7 +3,7 @@ from django.utils import timezone
 from .embeddings import get_embedding_model
 from .indexer import index_chunks
 from .pipeline import crawl_and_chunk
-
+from .graph import Neo4jClient
 
 def process_website(website, crawl):
     start_crawl(crawl)
@@ -17,7 +17,7 @@ def process_website(website, crawl):
         )
 
         index_website(chunks)
-
+        build_graph(website, chunks)
         complete_crawl(crawl, len(documents))
 
         return documents, chunks
@@ -51,3 +51,12 @@ def fail_crawl(crawl, error):
     crawl.error_message = str(error)
     crawl.completed_at = timezone.now()
     crawl.save()
+
+def build_graph(website, chunks):
+    graph = Neo4jClient()
+
+    try:
+        for chunk in chunks:
+            graph.create_chunk(website.id, chunk)
+    finally:
+        graph.close()
