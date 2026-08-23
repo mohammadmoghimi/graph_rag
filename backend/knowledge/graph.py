@@ -38,6 +38,39 @@ class Neo4jClient:
                 relationship
             )
 
+    def get_graph_data(self):
+        with self.driver.session() as session:
+            result = session.run(
+                """
+                MATCH (entity:Entity)
+                OPTIONAL MATCH (entity)-[:RELATED_TO]-(related:Entity)
+                RETURN
+                    entity.name AS name,
+                    entity.type AS type,
+                    collect(DISTINCT related.name) AS related
+                """
+            )
+
+            entities = []
+            relationships = []
+
+            for record in result:
+                entity = {
+                    "text": record["name"],
+                    "type": record["type"]
+                }
+
+                entities.append(entity)
+
+                for related in record["related"]:
+                    if related:
+                        relationships.append({
+                            "source": record["name"],
+                            "target": related
+                        })
+
+            return entities, relationships
+
 
     @staticmethod
     def _create_chunk(tx, website_id, chunk):
