@@ -70,6 +70,15 @@ class Neo4jClient:
                         })
 
             return entities, relationships
+        
+    def create_community(self, community_id, entities, summary):
+        with self.driver.session() as session:
+            session.execute_write(
+                self._create_community,
+                community_id,
+                entities,
+                summary
+            )
 
 
     @staticmethod
@@ -122,4 +131,20 @@ class Neo4jClient:
             source_type=relationship["source_type"],
             target=relationship["target"],
             target_type=relationship["target_type"]
+        )
+    @staticmethod
+    def _create_community(tx, community_id, entities, summary):
+        tx.run(
+            """
+            MERGE (community:Community {id: $community_id})
+            SET community.summary = $summary
+
+            WITH community
+            UNWIND $entities AS entity
+            MATCH (e:Entity {name: entity.text, type: entity.type})
+            MERGE (e)-[:BELONGS_TO]->(community)
+            """,
+            community_id=community_id,
+            entities=entities,
+            summary=summary
         )

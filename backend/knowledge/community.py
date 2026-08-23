@@ -18,10 +18,29 @@ def detect_communities(entities, relationships):
 
     communities = nx.community.greedy_modularity_communities(graph)
 
-    return [
-        list(community)
-        for community in communities
-    ]
+    result = []
+
+    for community in communities:
+        community_entities = [
+            entity
+            for entity in entities
+            if entity["text"] in community
+        ]
+
+        community_relationships = [
+            relationship
+            for relationship in relationships
+            if relationship["source"] in community
+            and relationship["target"] in community
+        ]
+
+        result.append({
+            "entities": community_entities,
+            "relationships": community_relationships
+        })
+
+    return result
+
 
 def detect_graph_communities(graph):
     entities, relationships = graph.get_graph_data()
