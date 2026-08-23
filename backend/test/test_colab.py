@@ -1,5 +1,7 @@
 from knowledge.embeddings import FastAPIEmbeddings
+from dotenv import load_dotenv
 
+load_dotenv()
 emb = FastAPIEmbeddings()
 
 # Test single embedding
