@@ -1,5 +1,7 @@
 from django.utils import timezone
 
+from .entity_extractor import EntityExtractor
+
 from .embeddings import get_embedding_model
 from .indexer import index_chunks
 from .pipeline import crawl_and_chunk
@@ -38,6 +40,24 @@ def index_website(chunks):
     index_chunks(chunks, embeddings)
 
 
+def build_graph(website, chunks):
+    extractor = EntityExtractor()
+    graph = Neo4jClient()
+
+    try:
+        for chunk in chunks:
+            graph.create_chunk(website.id, chunk)
+
+            entities = extractor.extract(chunk.page_content)
+
+            for entity in entities:
+                graph.create_entity(
+                    chunk.metadata["chunk_id"],
+                    entity
+                )
+    finally:
+        graph.close()
+
 def complete_crawl(crawl, page_count):
     crawl.pages_found = page_count
     crawl.pages_processed = page_count
@@ -51,12 +71,3 @@ def fail_crawl(crawl, error):
     crawl.error_message = str(error)
     crawl.completed_at = timezone.now()
     crawl.save()
-
-def build_graph(website, chunks):
-    graph = Neo4jClient()
-
-    try:
-        for chunk in chunks:
-            graph.create_chunk(website.id, chunk)
-    finally:
-        graph.close()
