@@ -55,6 +55,13 @@ def build_graph(website, chunks):
                     chunk.metadata["chunk_id"],
                     entity
                 )
+
+            relationships = extractor.extract_relationships(
+                chunk.page_content
+            )
+
+            for relationship in relationships:
+                graph.create_relationship(relationship)
     finally:
         graph.close()
 

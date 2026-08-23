@@ -31,6 +31,14 @@ class Neo4jClient:
                 entity
             )
 
+    def create_relationship(self, relationship):
+        with self.driver.session() as session:
+            session.execute_write(
+                self._create_relationship,
+                relationship
+            )
+
+
     @staticmethod
     def _create_chunk(tx, website_id, chunk):
         tx.run(
@@ -62,4 +70,23 @@ class Neo4jClient:
             chunk_id=chunk_id,
             name=entity["text"],
             type=entity["type"]
+        )
+    @staticmethod
+    def _create_relationship(tx, relationship):
+        tx.run(
+            """
+            MATCH (source:Entity {
+                name: $source,
+                type: $source_type
+            })
+            MATCH (target:Entity {
+                name: $target,
+                type: $target_type
+            })
+            MERGE (source)-[:RELATED_TO]->(target)
+            """,
+            source=relationship["source"],
+            source_type=relationship["source_type"],
+            target=relationship["target"],
+            target_type=relationship["target_type"]
         )
