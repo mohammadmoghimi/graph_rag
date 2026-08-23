@@ -8,29 +8,51 @@ class EntityExtractor:
     def extract(self, text):
         doc = self.nlp(text)
 
-        return [
-            {
-                "text": entity.text,
+        entities = []
+
+        for entity in doc.ents:
+            text = entity.text.strip()
+
+            if entity.label_ not in {"PER", "ORG", "LOC"}:
+                continue
+
+            if len(text) < 2:
+                continue
+
+            if text.isdigit():
+                continue
+
+            entities.append({
+                "text": text,
                 "type": entity.label_
-            }
-            for entity in doc.ents
-        ]
+            })
+
+        return entities
     
     def extract_relationships(self, text):
         doc = self.nlp(text)
+        entities = {}
+
+        for entity in doc.ents:
+            key = (entity.text.strip(), entity.label_)
+
+            if key not in entities:
+                entities[key] = {
+                    "text": entity.text.strip(),
+                    "type": entity.label_
+                }
+
         relationships = []
 
-        for sentence in doc.sents:
-            entities = list(sentence.ents)
+        entity_list = list(entities.values())
 
-            for i, source in enumerate(entities):
-                for target in entities[i + 1:]:
-                    if source.text != target.text:
-                        relationships.append({
-                            "source": source.text,
-                            "source_type": source.label_,
-                            "target": target.text,
-                            "target_type": target.label_
-                        })
+        for i, source in enumerate(entity_list):
+            for target in entity_list[i + 1:]:
+                relationships.append({
+                    "source": source["text"],
+                    "source_type": source["type"],
+                    "target": target["text"],
+                    "target_type": target["type"]
+                })
 
         return relationships
