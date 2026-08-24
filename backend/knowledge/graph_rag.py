@@ -4,7 +4,7 @@ from .llm import generate
 
 class GraphRAG:
     def __init__(self, retriever):
-        self.retriever = GraphRetriever(retriever)
+        self.retriever = retriever
 
     def answer(self, question):
         documents = self.retriever.retrieve(question)

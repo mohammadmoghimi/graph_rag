@@ -1,8 +1,11 @@
+from chat.chat_service import answer_question
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-
-from .models import ChatSession
+from rest_framework.response import Response
+from rest_framework import status
+from .models import ChatMessage, ChatSession
 from .serializers import ChatSessionSerializer
+from rest_framework.decorators import action
 
 
 class ChatSessionViewSet(viewsets.ModelViewSet):
@@ -16,3 +19,40 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
             "websites",
             "messages"
         )
+
+    @action(detail=True, methods=["post"])
+    def ask(self, request, pk=None):
+        chat = self.get_object()
+
+        question = request.data.get("question")
+
+        if not question:
+            return Response(
+                {"error": "Question is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        website_ids = list(
+            chat.websites.values_list("id", flat=True)
+        )
+
+        answer = answer_question(
+            question,
+            website_ids
+        )
+
+        ChatMessage.objects.create(
+            chat_session=chat,
+            role="user",
+            content=question
+        )
+
+        ChatMessage.objects.create(
+            chat_session=chat,
+            role="assistant",
+            content=answer
+        )
+
+        return Response({
+            "answer": answer
+        })
