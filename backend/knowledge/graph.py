@@ -79,17 +79,16 @@ class Neo4jClient:
                 entities,
                 summary
             )
-    def get_chunk_graph(self, chunk_ids):
+    def get_chunk_graph(self, chunk_ids, website_ids):
         with self.driver.session() as session:
             result = session.run(
                 """
-                MATCH (chunk:Chunk)
+                MATCH (website:Website)-[:HAS_CHUNK]->(chunk:Chunk)
                 WHERE chunk.id IN $chunk_ids
+                AND website.id IN $website_ids
 
                 OPTIONAL MATCH (chunk)-[:MENTIONS]->(entity:Entity)
-
                 OPTIONAL MATCH (entity)-[:RELATED_TO]-(related:Entity)
-
                 OPTIONAL MATCH (entity)-[:BELONGS_TO]->(community:Community)
 
                 RETURN
@@ -107,7 +106,8 @@ class Neo4jClient:
                         summary: community.summary
                     }) AS communities
                 """,
-                chunk_ids=chunk_ids
+                chunk_ids=chunk_ids,
+                website_ids=website_ids
             )
 
             return [record.data() for record in result]

@@ -4,8 +4,9 @@ from .graph import Neo4jClient
 
 
 class GraphRetriever:
-    def __init__(self, retriever):
+    def __init__(self, retriever, website_ids):
         self.retriever = retriever
+        self.website_ids = website_ids
 
     def retrieve(self, query):
         documents = self.retriever.invoke(query)
@@ -19,7 +20,7 @@ class GraphRetriever:
         graph = Neo4jClient()
 
         try:
-            graph_data = graph.get_chunk_graph(chunk_ids)
+            graph_data = graph.get_chunk_graph(chunk_ids,self.website_ids)
         finally:
             graph.close()
 

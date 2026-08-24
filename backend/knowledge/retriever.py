@@ -9,6 +9,7 @@ class ElasticsearchHybridRetriever(BaseRetriever):
     es_client: Elasticsearch
     index_name: str
     embedding_model: any
+    website_ids: list[int] = []
     text_field: str = "text"
     embedding_field: str = "vector"
     k: int = 4
@@ -26,12 +27,21 @@ class ElasticsearchHybridRetriever(BaseRetriever):
 
         bm25_body = {
             "query": {
-                "multi_match": {
-                    "query": query,
-                    "fields": [self.text_field]
+                "bool": {
+                    "must": {
+                        "multi_match": {
+                            "query": query,
+                            "fields": [self.text_field]
+                        }
+                    },
+                    "filter": {
+                        "terms": {
+                            "metadata.website_id": self.website_ids
+                        }
+                    }
                 }
             },
-            "size": self.num_candidates,  
+            "size": self.num_candidates,
             "_source": [self.text_field, "metadata"]
         }
         bm25_response = self.es_client.search(index=self.index_name, body=bm25_body)
@@ -42,7 +52,14 @@ class ElasticsearchHybridRetriever(BaseRetriever):
                 "field": self.embedding_field,
                 "query_vector": query_vector,
                 "k": self.num_candidates,
-                "num_candidates": self.num_candidates
+                "num_candidates": self.num_candidates,
+                "filter": [
+                    {
+                        "terms": {
+                            "metadata.website_id": self.website_ids
+                        }
+                    }
+                ]
             },
             "size": self.num_candidates,
             "_source": [self.text_field, "metadata"]
