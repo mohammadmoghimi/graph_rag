@@ -36,9 +36,17 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
             chat.websites.values_list("id", flat=True)
         )
 
+        history = list(
+            chat.messages.order_by("created_at").values(
+                "role",
+                "content"
+            )
+        )
+
         answer = answer_question(
             question,
-            website_ids
+            website_ids,
+            history
         )
 
         ChatMessage.objects.create(

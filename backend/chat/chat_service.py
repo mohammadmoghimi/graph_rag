@@ -5,7 +5,7 @@ from knowledge.graph_rag import GraphRAG
 from elasticsearch import Elasticsearch
 
 
-def answer_question(question, website_ids):
+def answer_question(question, website_ids,history):
     es = Elasticsearch("http://localhost:9200")
     embeddings = get_embedding_model()
 
@@ -24,4 +24,4 @@ def answer_question(question, website_ids):
 
     rag = GraphRAG(graph_retriever)
 
-    return rag.answer(question)
+    return rag.answer(question , history)

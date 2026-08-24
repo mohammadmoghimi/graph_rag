@@ -6,13 +6,19 @@ class GraphRAG:
     def __init__(self, retriever):
         self.retriever = retriever
 
-    def answer(self, question):
+    def answer(self, question, history):
         documents = self.retriever.retrieve(question)
 
         context = "\n\n".join(
             document.page_content
             for document in documents
         )
+
+        conversation = "\n".join(
+            f"{message['role']}: {message['content']}"
+            for message in history
+        )
+
 
         prompt = f"""
 تو یک دستیار پرسش و پاسخ درباره یک وب‌سایت هستی.
@@ -22,6 +28,9 @@ class GraphRAG:
 «اطلاعات کافی برای پاسخ به این سؤال پیدا نشد.»
 
 پاسخ را به زبان فارسی و کوتاه ارائه کن.
+
+Conversation:
+{conversation}
 
 Context:
 {context}
