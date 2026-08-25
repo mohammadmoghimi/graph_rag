@@ -52,4 +52,10 @@ export class Auth {
     return !!localStorage.getItem('access_token');
   }
   
+  refreshToken(refresh: string): Observable<{ access: string }> {
+    return this.http.post<{ access: string }>(
+      `${this.apiUrl}/auth/refresh/`,
+      { refresh }
+    );
+  }
 }

@@ -1,102 +1,67 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Website, WebsiteService } from '../../services/website';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
+import { WebsiteService } from '../../services/website';
 
 @Component({
   selector: 'app-websites',
-  imports: [CommonModule, FormsModule],
+  standalone: true,
+  imports: [ReactiveFormsModule],
   templateUrl: './websites.html',
-  styleUrl: './websites.scss',
+  styleUrl: './websites.scss'
 })
 export class Websites implements OnInit {
-addWebsite() {
-throw new Error('Method not implemented.');
-}
-  websites: Website[] = [];
-
-  name = '';
-  url = '';
-  description = '';
-
+  isCrawling = false;
   errorMessage = '';
   successMessage = '';
-  loading = false;
+  websiteForm!: FormGroup;
 
   constructor(
+    private formBuilder: FormBuilder,
     private websiteService: WebsiteService
   ) {}
 
-  ngOnInit() {
-    this.loadWebsites();
-  }
-
-  loadWebsites() {
-    this.websiteService.getWebsites().subscribe({
-      next: websites => {
-        this.websites = websites;
-      },
-      error: () => {
-        this.errorMessage = 'Could not load websites.';
-      }
+  ngOnInit(): void {
+    this.websiteForm = this.formBuilder.group({
+      name: ['', Validators.required],
+      url: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]],
+      description: ['']
     });
   }
 
-  // crawlWebsite() {
-  //   this.errorMessage = '';
-  //   this.successMessage = '';
+  submit() {
+    console.log('SUBMIT');
+    if (this.websiteForm.invalid || this.isCrawling) {
+      this.websiteForm.markAllAsTouched();
+      return;
+    }
 
-  //   this.loading = true;
+    const { name, url, description } = this.websiteForm.getRawValue();
 
-  //   this.websiteService.createWebsite(
-  //     this.name,
-  //     this.url,
-  //     this.description
-  //   ).subscribe({
-  //     next: website => {
-  //       this.websites.push(website);
+    this.isCrawling = true;
+    this.errorMessage = '';
+    this.successMessage = '';
 
-  //       this.name = '';
-  //       this.url = '';
-  //       this.description = '';
+    console.log('SENDING REQUEST');
+    this.websiteService
+      .crawlWebsite(name!, url!, description || '')
+      .subscribe({
+        next: response => {
+          this.isCrawling = false;
+          this.successMessage =
+            `وب‌سایت با موفقیت پردازش شد. ${response.crawl.pages_processed} صفحه پردازش شد.`;
 
-  //       this.successMessage = 'Website added successfully.';
-  //       this.loading = false;
-  //     },
-  //     error: () => {
-  //       this.errorMessage = 'Could not add website.';
-  //       this.loading = false;
-  //     }
-  //   });
-  // }
-
-  deleteWebsite(id: number) {
-    this.websiteService.deleteWebsite(id).subscribe({
-      next: () => {
-        this.websites = this.websites.filter(
-          website => website.id !== id
-        );
-      },
-      error: () => {
-        this.errorMessage = 'Could not delete website.';
-      }
-    });
+          this.websiteForm.reset();
+        },
+        error: error => {
+          this.isCrawling = false;
+          this.errorMessage =
+            error.error?.error || 'خطا در پردازش وب‌سایت.';
+        }
+      });
   }
-
-//   crawlWebsite(id: number) {
-//   this.websiteService.crawlWebsite(id).subscribe({
-//     next: () => {
-//       const website = this.websites.find(
-//         website => website.id === id
-//       );
-
-//       if (website) {
-//         website.status = 'pending';
-//       }
-//     },
-//     error: () => {
-//       this.errorMessage = 'Could not start crawl.';
-//     }
-//   });
-// }
 }

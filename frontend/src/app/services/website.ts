@@ -13,6 +13,23 @@ export interface Website {
   last_crawled_at: string | null;
 }
 
+export interface Crawl {
+  id: number;
+  website: number;
+  status: string;
+  pages_found: number;
+  pages_processed: number;
+  error_message: string;
+  created_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+}
+
+export interface CrawlResponse {
+  website: Website;
+  crawl: Crawl;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -47,11 +64,8 @@ export class WebsiteService {
     );
   }
 
-  crawlWebsite(id: number): Observable<any> {
-  return this.http.post(
-    `${this.apiUrl}/${id}/crawl/`,
-    {}
-  );
+crawlWebsite(name: string , url:string , description:string):Observable<CrawlResponse> {
+  return this.http.post<CrawlResponse>(`${this.apiUrl}/crawl/`,{name, url , description});
 }
   
 }

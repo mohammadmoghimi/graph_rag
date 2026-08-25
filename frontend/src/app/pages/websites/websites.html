@@ -1,152 +1,102 @@
-<div class="container-fluid p-4">
+<div class="website-page" dir="rtl">
 
-  <h2>Websites</h2>
-
-  <p class="text-muted">
-    Add websites to your knowledge base.
-  </p>
-
-  @if (errorMessage) {
-    <div class="alert alert-danger">
-      {{ errorMessage }}
+  <div class="page-header">
+    <div>
+      <h2>وب‌سایت‌ها</h2>
+      <p>وب‌سایت خود را برای ساخت پایگاه دانش اضافه کنید.</p>
     </div>
-  }
+  </div>
 
-  @if (successMessage) {
-    <div class="alert alert-success">
-      {{ successMessage }}
-    </div>
-  }
-
-  <div class="card mb-4">
+  <div class="card website-card">
     <div class="card-body">
 
-      <h5 class="card-title">
-        Crawl Website
-      </h5>
+      <form [formGroup]="websiteForm" (ngSubmit)="submit()">
 
-      <form (ngSubmit)="addWebsite()">
-
-        <div class="mb-3">
-          <label class="form-label">
-            Name
-          </label>
+        <div class="mb-4">
+          <label class="form-label">نام وب‌سایت</label>
 
           <input
             type="text"
             class="form-control"
-            [(ngModel)]="name"
-            name="name"
-            required
+            formControlName="name"
+            placeholder="مثلاً وب‌سایت دانشگاه تهران"
           >
+
+          @if (
+            websiteForm.controls['name'].touched &&
+            websiteForm.controls['name'].invalid
+          ) {
+            <div class="text-danger validation-message">
+              نام وب‌سایت الزامی است.
+            </div>
+          }
         </div>
 
-        <div class="mb-3">
-          <label class="form-label">
-            Website URL
-          </label>
+        <div class="mb-4">
+          <label class="form-label">آدرس وب‌سایت</label>
 
           <input
             type="url"
             class="form-control"
-            [(ngModel)]="url"
-            name="url"
+            formControlName="url"
             placeholder="https://example.com"
-            required
+            dir="ltr"
           >
+
+          @if (
+            websiteForm.controls['url'].touched &&
+            websiteForm.controls['url'].invalid
+          ) {
+            <div class="text-danger validation-message">
+              یک آدرس معتبر وارد کنید.
+            </div>
+          }
         </div>
 
-        <div class="mb-3">
-          <label class="form-label">
-            Description
-          </label>
+        <div class="mb-4">
+          <label class="form-label">توضیحات</label>
 
           <textarea
             class="form-control"
-            [(ngModel)]="description"
-            name="description"
-            rows="3"
+            rows="4"
+            formControlName="description"
+            placeholder="توضیح کوتاهی درباره وب‌سایت..."
           ></textarea>
         </div>
 
         <button
           type="submit"
-          class="btn btn-primary"
-          [disabled]="loading"
+          class="btn btn-primary crawl-btn"
+          [disabled]="websiteForm.invalid || isCrawling"
         >
-          {{ loading ? 'Crawling...' : 'Crawl Website' }}
+          @if (isCrawling) {
+            <span
+              class="spinner-border spinner-border-sm"
+              role="status"
+            ></span>
+
+            <span>در حال پردازش...</span>
+          } @else {
+            <i class="bi bi-globe2"></i>
+            <span>شروع پردازش</span>
+          }
         </button>
 
       </form>
 
+      @if (successMessage) {
+        <div class="alert alert-success mt-4">
+          {{ successMessage }}
+        </div>
+      }
+
+      @if (errorMessage) {
+        <div class="alert alert-danger mt-4">
+          {{ errorMessage }}
+        </div>
+      }
+
     </div>
   </div>
-
-
-  <h4>Your Websites</h4>
-
-  @if (websites.length === 0) {
-    <div class="text-muted">
-      You haven't added any websites yet.
-    </div>
-  }
-
-  @for (website of websites; track website.id) {
-    <div class="card mb-3">
-      <div class="card-body">
-
-        <div class="d-flex justify-content-between">
-
-          <div>
-            <h5>{{ website.name }}</h5>
-
-            <a
-              [href]="website.url"
-              target="_blank"
-            >
-              {{ website.url }}
-            </a>
-
-            <p class="mt-2 mb-1">
-              {{ website.description }}
-            </p>
-
-            <span
-            class="badge"
-            [ngClass]="{
-                'bg-secondary': website.status === 'pending',
-                'bg-warning text-dark': website.status === 'crawling',
-                'bg-success': website.status === 'completed',
-                'bg-danger': website.status === 'failed'
-            }"
-            >
-            {{ website.status }}
-            </span>
-          </div>
-
-          <div>
-            <div>
-            <!-- <button
-                class="btn btn-sm btn-primary me-2"
-                /* (click)="crawlWebsite(website.id)" */
-                [disabled]="website.status === 'pending' || website.status === 'crawling'">
-            
-                Crawl
-            </button> -->
-
-            <button
-                class="btn btn-sm btn-danger"
-                (click)="deleteWebsite(website.id)"
-            >
-                Delete
-            </button>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-  } 
 
 </div>
