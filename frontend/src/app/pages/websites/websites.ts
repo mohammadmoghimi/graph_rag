@@ -35,26 +35,29 @@ export class Websites implements OnInit {
 
   submit() {
     console.log('SUBMIT');
+
     if (this.websiteForm.invalid || this.isCrawling) {
       this.websiteForm.markAllAsTouched();
       return;
     }
 
     const { name, url, description } = this.websiteForm.getRawValue();
+    this.processCrawl(name!, url!, description || '');
+  }
 
+  private processCrawl(name: string, url: string, description: string) {
     this.isCrawling = true;
     this.errorMessage = '';
     this.successMessage = '';
 
     console.log('SENDING REQUEST');
     this.websiteService
-      .crawlWebsite(name!, url!, description || '')
+      .crawlWebsite(name, url, description)
       .subscribe({
         next: response => {
           this.isCrawling = false;
           this.successMessage =
             `وب‌سایت با موفقیت پردازش شد. ${response.crawl.pages_processed} صفحه پردازش شد.`;
-
           this.websiteForm.reset();
         },
         error: error => {
