@@ -1,102 +1,176 @@
-<div class="website-page" dir="rtl">
+<div class="container-fluid px-0" dir="rtl">
 
-  <div class="page-header">
+  <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h2>وب‌سایت‌ها</h2>
-      <p>وب‌سایت خود را برای ساخت پایگاه دانش اضافه کنید.</p>
+      <h2 class="fw-semibold mb-1">وب‌سایت‌ها</h2>
+      <p class="text-secondary mb-0">پایگاه‌های دانش خود را مدیریت کنید.</p>
     </div>
+
+    <span class="badge text-bg-light border px-3 py-2">
+      {{ websites.length }} وب‌سایت
+    </span>
   </div>
 
-  <div class="card website-card">
-    <div class="card-body">
+  <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3">
+          <i class="bi bi-globe2 fs-4"></i>
+        </div>
+        <div>
+          <h5 class="fw-semibold mb-1">افزودن وب‌سایت</h5>
+          <small class="text-secondary">
+            وب‌سایت را وارد کنید تا پایگاه دانش آن ساخته شود.
+          </small>
+        </div>
+      </div>
 
       <form [formGroup]="websiteForm" (ngSubmit)="submit()">
 
-        <div class="mb-4">
-          <label class="form-label">نام وب‌سایت</label>
+        <div class="row g-3">
 
-          <input
-            type="text"
-            class="form-control"
-            formControlName="name"
-            placeholder="مثلاً وب‌سایت دانشگاه تهران"
+          <div class="col-12 col-lg-6">
+            <label class="form-label fw-medium">نام وب‌سایت</label>
+
+            <input
+              class="form-control form-control-lg"
+              formControlName="name"
+              placeholder="مثلاً دانشگاه تهران"
+            >
+
+            @if (websiteForm.controls['name'].touched &&
+                 websiteForm.controls['name'].invalid) {
+              <small class="text-danger">نام وب‌سایت الزامی است.</small>
+            }
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <label class="form-label fw-medium">آدرس وب‌سایت</label>
+
+            <input
+              class="form-control form-control-lg"
+              formControlName="url"
+              placeholder="https://example.com"
+              dir="ltr"
+            >
+
+            @if (websiteForm.controls['url'].touched &&
+                 websiteForm.controls['url'].invalid) {
+              <small class="text-danger">آدرس معتبر وارد کنید.</small>
+            }
+          </div>
+
+          <div class="col-12">
+            <label class="form-label fw-medium">توضیحات</label>
+
+            <textarea
+              class="form-control"
+              rows="3"
+              formControlName="description"
+              placeholder="توضیح کوتاهی درباره این وب‌سایت..."
+            ></textarea>
+          </div>
+
+        </div>
+
+        <div class="d-flex justify-content-end mt-4">
+          <button
+            class="btn btn-primary px-4 py-2"
+            [disabled]="websiteForm.invalid || isCrawling"
           >
-
-          @if (
-            websiteForm.controls['name'].touched &&
-            websiteForm.controls['name'].invalid
-          ) {
-            <div class="text-danger validation-message">
-              نام وب‌سایت الزامی است.
-            </div>
-          }
+            @if (isCrawling) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              در حال ساخت پایگاه دانش...
+            } @else {
+              <i class="bi bi-stars me-2"></i>
+              ساخت پایگاه دانش
+            }
+          </button>
         </div>
-
-        <div class="mb-4">
-          <label class="form-label">آدرس وب‌سایت</label>
-
-          <input
-            type="url"
-            class="form-control"
-            formControlName="url"
-            placeholder="https://example.com"
-            dir="ltr"
-          >
-
-          @if (
-            websiteForm.controls['url'].touched &&
-            websiteForm.controls['url'].invalid
-          ) {
-            <div class="text-danger validation-message">
-              یک آدرس معتبر وارد کنید.
-            </div>
-          }
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label">توضیحات</label>
-
-          <textarea
-            class="form-control"
-            rows="4"
-            formControlName="description"
-            placeholder="توضیح کوتاهی درباره وب‌سایت..."
-          ></textarea>
-        </div>
-
-        <button
-          type="submit"
-          class="btn btn-primary crawl-btn"
-          [disabled]="websiteForm.invalid || isCrawling"
-        >
-          @if (isCrawling) {
-            <span
-              class="spinner-border spinner-border-sm"
-              role="status"
-            ></span>
-
-            <span>در حال پردازش...</span>
-          } @else {
-            <i class="bi bi-globe2"></i>
-            <span>شروع پردازش</span>
-          }
-        </button>
 
       </form>
 
       @if (successMessage) {
-        <div class="alert alert-success mt-4">
+        <div class="alert alert-success border-0 mt-4 mb-0">
+          <i class="bi bi-check-circle me-2"></i>
           {{ successMessage }}
         </div>
       }
 
       @if (errorMessage) {
-        <div class="alert alert-danger mt-4">
+        <div class="alert alert-danger border-0 mt-4 mb-0">
+          <i class="bi bi-exclamation-circle me-2"></i>
           {{ errorMessage }}
         </div>
       }
 
     </div>
   </div>
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="fw-semibold mb-0">پایگاه‌های دانش</h5>
+  </div>
+
+  @if (isLoading) {
+
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="text-secondary mt-3 mb-0">در حال دریافت وب‌سایت‌ها...</p>
+    </div>
+
+  } @else if (websites.length === 0) {
+
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-globe2 display-5 text-secondary"></i>
+        <h5 class="mt-3">هنوز وب‌سایتی اضافه نشده است</h5>
+        <p class="text-secondary mb-0">
+          اولین پایگاه دانش خود را ایجاد کنید.
+        </p>
+      </div>
+    </div>
+
+  } @else {
+
+    <div class="row g-3">
+
+      @for (website of websites; track website.id) {
+
+        <div class="col-12 col-md-6 col-xl-4">
+
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4 website-card">
+
+              <div class="d-flex justify-content-between align-items-start mb-3">
+
+                <div class="d-flex align-items-center gap-3">
+                  <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2">
+                    <i class="bi bi-globe2 fs-5"></i>
+                  </div>
+
+                  <div>
+                    <h6 class="fw-semibold mb-1">{{ website.name }}</h6>
+                    <small class="text-secondary" dir="ltr">
+                      {{ truncateUrl(website.url) }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-secondary small mb-3">
+                {{ website.description || 'بدون توضیحات' }}
+              </p>
+
+            </div>
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  }
 
 </div>
