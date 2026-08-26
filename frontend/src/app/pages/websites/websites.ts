@@ -1,5 +1,5 @@
 import { ChatService } from './../../services/chat';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, WritableSignal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -19,11 +19,12 @@ import { Router } from '@angular/router';
 export class Websites implements OnInit {
 
   websiteForm!: FormGroup;
-  websites: Website[] = [];
-  isCrawling = false;
-  isLoading = true;
-  errorMessage = '';
-  successMessage = '';
+  websites = signal<Website[]>([]);
+  isCrawling = signal(false);
+  isLoading = signal(true);
+  errorMessage = signal('');
+  successMessage = signal('');
+  selectedWebsiteIds = signal<Set<number>>(new Set());
 
   constructor(
     private formBuilder: FormBuilder,
@@ -43,7 +44,7 @@ export class Websites implements OnInit {
   }
 
   submit() {
-    if (this.websiteForm.invalid || this.isCrawling) {
+    if (this.websiteForm.invalid || this.isCrawling()) {
       this.websiteForm.markAllAsTouched();
       return;
     }
@@ -57,12 +58,12 @@ export class Websites implements OnInit {
       next: websites => {
         console.log(websites,'websites');
         
-        this.websites = websites;
-        this.isLoading = false;
+        this.websites.set(websites);
+        this.isLoading.set(false);
       },
       error: () => {
-        this.errorMessage = 'خطا در دریافت وب‌سایت‌ها.';
-        this.isLoading = false;
+        this.errorMessage.set('خطا در دریافت وب‌سایت‌ها.');
+        this.isLoading.set(false);
         console.log(Error , 'error');
         
       }
@@ -74,23 +75,25 @@ export class Websites implements OnInit {
     url: string,
     description: string
   ) {
-    this.isCrawling = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+  this.isCrawling.set(true);
+  this.errorMessage.set('');
+  this.successMessage.set('');
 
     this.websiteService.crawlWebsite(name, url, description).subscribe({
       next: response => {
-        this.isCrawling = false;
-        this.successMessage =
-          `وب‌سایت با موفقیت پردازش شد. ${response.crawl.pages_processed} صفحه پردازش شد.`;
+        this.isCrawling.set(false);
+        this.successMessage.set(
+          `وب‌سایت با موفقیت پردازش شد. ${response.crawl.pages_processed} صفحه پردازش شد.`
+        );
 
         this.websiteForm.reset();
         this.loadWebsites();
       },
       error: error => {
-        this.isCrawling = false;
-        this.errorMessage =
-          error.error?.error || 'خطا در پردازش وب‌سایت.';
+        this.isCrawling.set(false);
+        this.errorMessage.set(
+          error.error?.error || 'خطا در پردازش وب‌سایت.'
+        );
       }
     });
   }
@@ -101,20 +104,21 @@ export class Websites implements OnInit {
     return url.length > maxLength ? url.substring(0, maxLength) + '...' : url;
   }
 
-  selectedWebsiteIds = new Set<number>();
 
   toggleWebsite(id: number) {
-    this.selectedWebsiteIds.has(id)
-      ? this.selectedWebsiteIds.delete(id)
-      : this.selectedWebsiteIds.add(id);
+    this.selectedWebsiteIds.update(set => {
+      const newSet = new Set(set);
+      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+      return newSet;
+    });
   }
 
   isSelected(id: number) {
-    return this.selectedWebsiteIds.has(id);
+    return this.selectedWebsiteIds().has(id);
   }
 
   startChat() {
-    const websiteIds = [...this.selectedWebsiteIds];
+    const websiteIds = [...this.selectedWebsiteIds()];
     console.log(websiteIds , 'website ids');
     
     if (!websiteIds.length) return;
@@ -126,14 +130,15 @@ export class Websites implements OnInit {
       next: chat => {
         console.log('success');
         
-        this.selectedWebsiteIds.clear();
+        this.selectedWebsiteIds.set(new Set());
         this.router.navigate(['/chats', chat.id]);
       },
       error: error => {
-        this.errorMessage =
+        this.errorMessage.set(
           error.error?.detail ||
           error.error?.error ||
-          'خطا در ایجاد گفتگو.';
+          'خطا در ایجاد گفتگو.'
+        );
       }
     });
   }

@@ -76,7 +76,7 @@
             class="btn btn-primary px-4 py-2"
             [disabled]="websiteForm.invalid || isCrawling"
           >
-            @if (isCrawling) {
+            @if (isCrawling()) {
               <span class="spinner-border spinner-border-sm me-2"></span>
               در حال ساخت پایگاه دانش...
             } @else {
@@ -88,17 +88,17 @@
 
       </form>
 
-      @if (successMessage) {
+      @if (successMessage()) {
         <div class="alert alert-success border-0 mt-4 mb-0">
           <i class="bi bi-check-circle me-2"></i>
-          {{ successMessage }}
+          {{ successMessage() }}
         </div>
       }
 
-      @if (errorMessage) {
+      @if (errorMessage()) {
         <div class="alert alert-danger border-0 mt-4 mb-0">
           <i class="bi bi-exclamation-circle me-2"></i>
-          {{ errorMessage }}
+          {{ errorMessage() }}
         </div>
       }
 
@@ -109,21 +109,21 @@
     <h5 class="fw-semibold mb-0">برای شروع چت ، وب سایت های مورد نظر خود را انتخاب کنید</h5>
     
     <span class="badge text-bg-light border px-3 py-2">
-      {{ websites.length }} وب‌سایت
+      {{ websites().length }} وب‌سایت
     </span>
     <span class="badge text-bg-light border px-3 py-2">
-      {{ selectedWebsiteIds.size  }} انتخاب شده
+      {{ selectedWebsiteIds().size }} انتخاب شده
     </span>
   </div>
 
-  @if (isLoading) {
+  @if (isLoading()) {
 
     <div class="text-center py-5">
       <div class="spinner-border text-primary"></div>
       <p class="text-secondary mt-3 mb-0">در حال دریافت وب‌سایت‌ها...</p>
     </div>
 
-  } @else if (websites.length === 0) {
+  } @else if (websites().length === 0) {
 
     <div class="card border-0 shadow-sm rounded-4">
       <div class="card-body text-center py-5">
@@ -139,7 +139,7 @@
 
     <div class="row g-3">
 
-      @for (website of websites; track website.id) {
+      @for (website of websites(); track website.id) {
 
         <div class="col-12 col-md-6 col-xl-4">
 
@@ -193,14 +193,14 @@
 
   }
 
-      @if (selectedWebsiteIds.size > 0) {
+      @if (selectedWebsiteIds().size > 0) {
       <div class="position-fixed bottom-0 start-50 translate-middle-x mb-4 z-3">
         <button
           class="btn btn-primary btn-lg rounded-pill shadow px-4"
           (click)="startChat()"
         >
           <i class="bi bi-chat-dots me-2"></i>
-          گفتگو با {{ selectedWebsiteIds.size }} وب‌سایت
+          گفتگو با {{ selectedWebsiteIds().size }} وب‌سایت
         </button>
       </div>
     }

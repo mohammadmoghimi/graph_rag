@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Auth } from '../../services/auth';
@@ -6,16 +6,16 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule , CommonModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
-  isSignup = false;
-  isLoading = false;
-  errorMessage = '';
+export class Login implements OnInit {
+  isSignup = signal(false);
+  isLoading = signal(false);
+  errorMessage = signal('');
 
-  loginForm!: FormGroup;     
+  loginForm!: FormGroup;
   signupForm!: FormGroup;
 
   constructor(
@@ -40,33 +40,34 @@ export class Login {
   }
 
   switchMode(signup: boolean) {
-    this.isSignup = signup;
-    this.errorMessage = '';
+    this.isSignup.set(signup);
+    this.errorMessage.set('');
   }
 
   login() {
-    if (this.loginForm.invalid || this.isLoading) return;
+    if (this.loginForm.invalid || this.isLoading()) return;
 
-    this.isLoading = true;
-    this.errorMessage = '';
+    this.isLoading.set(true);
+    this.errorMessage.set('');
 
     const { username, password } = this.loginForm.getRawValue();
 
     this.auth.login(username, password).subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: error => {
-        this.isLoading = false;
-        this.errorMessage =
-          error.error?.detail || 'نام کاربری یا رمز عبور اشتباه است.';
+        this.isLoading.set(false);
+        this.errorMessage.set(
+          'نام کاربری یا رمز عبور اشتباه است.'
+        );
       }
     });
   }
 
   signup() {
-    if (this.signupForm.invalid || this.isLoading) return;
+    if (this.signupForm.invalid || this.isLoading()) return;
 
-    this.isLoading = true;
-    this.errorMessage = '';
+    this.isLoading.set(true);
+    this.errorMessage.set('');
 
     this.auth.signup(this.signupForm.getRawValue()).subscribe({
       next: () => {
@@ -75,18 +76,19 @@ export class Login {
         this.auth.login(username, password).subscribe({
           next: () => this.router.navigate(['/dashboard']),
           error: () => {
-            this.isLoading = false;
-            this.errorMessage = 'ثبت‌نام انجام شد. ورود ناموفق بود.';
+            this.isLoading.set(false);
+            this.errorMessage.set('ثبت‌نام انجام شد. ورود ناموفق بود.');
           }
         });
       },
       error: error => {
-        this.isLoading = false;
-        this.errorMessage =
+        this.isLoading.set(false);
+        this.errorMessage.set(
           error.error?.username?.[0] ||
           error.error?.email?.[0] ||
           error.error?.detail ||
-          'ثبت‌نام انجام نشد.';
+          'ثبت‌نام انجام نشد.'
+        );
       }
     });
   }

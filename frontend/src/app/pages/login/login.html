@@ -14,7 +14,7 @@
           <h3 class="fw-bold mb-1">Graph RAG</h3>
 
           <p class="text-secondary mb-0">
-            {{ isSignup ? 'ساخت حساب کاربری' : 'ورود به حساب کاربری' }}
+            {{ isSignup() ? 'ساخت حساب کاربری' : 'ورود به حساب کاربری' }}
           </p>
         </div>
 
@@ -23,8 +23,8 @@
           <button
             type="button"
             class="btn"
-            [class.btn-primary]="!isSignup"
-            [class.btn-outline-primary]="isSignup"
+            [class.btn-primary]="!isSignup()"
+            [class.btn-outline-primary]="isSignup()"
             (click)="switchMode(false)"
           >
             ورود
@@ -33,8 +33,8 @@
           <button
             type="button"
             class="btn"
-            [class.btn-primary]="isSignup"
-            [class.btn-outline-primary]="!isSignup"
+            [class.btn-primary]="isSignup()"
+            [class.btn-outline-primary]="!isSignup()"
             (click)="switchMode(true)"
           >
             ثبت‌نام
@@ -42,13 +42,13 @@
 
         </div>
 
-        @if (errorMessage) {
+        @if (errorMessage()) {
           <div class="alert alert-danger">
-            {{ errorMessage }}
+            {{ errorMessage() }}
           </div>
         }
 
-        @if (!isSignup) {
+        @if (!isSignup()) {
 
           <form
             [formGroup]="loginForm"
@@ -80,9 +80,9 @@
             <button
               type="submit"
               class="btn btn-primary w-100"
-              [disabled]="loginForm.invalid || isLoading"
+              [disabled]="loginForm.invalid || isLoading()"
             >
-              @if (isLoading) {
+              @if (isLoading()) {
                 <span class="spinner-border spinner-border-sm"></span>
                 <span class="ms-2">در حال ورود...</span>
               } @else {
@@ -164,9 +164,9 @@
             <button
               type="submit"
               class="btn btn-primary w-100"
-              [disabled]="signupForm.invalid || isLoading"
+              [disabled]="signupForm.invalid || isLoading()"
             >
-              @if (isLoading) {
+              @if (isLoading()) {
                 <span class="spinner-border spinner-border-sm"></span>
                 <span class="ms-2">در حال ثبت‌نام...</span>
               } @else {

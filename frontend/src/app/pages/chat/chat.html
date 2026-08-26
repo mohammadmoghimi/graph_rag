@@ -1,6 +1,6 @@
 <div class="container-fluid h-100 px-0" dir="rtl">
 
-  @if (isLoading) {
+  @if (isLoading()) {
 
     <div class="d-flex justify-content-center align-items-center h-100">
       <div class="text-center text-secondary">
@@ -9,7 +9,7 @@
       </div>
     </div>
 
-  } @else if (chat) {
+  } @else if (chat()) {
 
     <div class="d-flex flex-column vh-100">
 
@@ -20,11 +20,11 @@
 
           <div>
             <h5 class="fw-semibold mb-2">
-              {{ chat.title }}
+              {{ chat()!.title }}
             </h5>
 
             <div class="d-flex flex-wrap gap-2">
-              @for (website of chat.websites; track website.id) {
+              @for (website of chat()!.websites; track website.id) {
                 <span class="badge text-bg-light border">
                   <i class="bi bi-globe2 me-1"></i>
                   {{ website.name }}
@@ -75,7 +75,7 @@
 
           <div class="d-flex flex-column gap-4">
 
-            @for (message of messages; track $index) {
+            @for (message of messages(); track $index) {
 
               <div
                 class="d-flex"
@@ -123,7 +123,7 @@
 
             }
 
-            @if (isSending) {
+            @if (isSending()) {
 
               <div class="d-flex justify-content-end">
 
@@ -180,15 +180,15 @@
             name="message"
             placeholder="سؤال خود را درباره وب‌سایت‌ها بنویسید..."
             autocomplete="off"
-            [disabled]="isSending"
+            [disabled]="isSending()"
           >
 
           <button
             type="submit"
             class="btn btn-primary rounded-4 px-4"
-            [disabled]="!message.trim() || isSending"
+            [disabled]="!message().trim() || isSending"
           >
-            @if (isSending) {
+            @if (isSending()) {
               <span class="spinner-border spinner-border-sm"></span>
             } @else {
               <i class="bi bi-send"></i>

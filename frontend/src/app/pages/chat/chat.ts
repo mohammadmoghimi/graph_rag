@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, WritableSignal } from '@angular/core';
 import { ChatService, ChatSession } from '../../services/chat';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -9,10 +9,13 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './chat.html',
   styleUrl: './chat.scss',
 })
-export class Chat implements OnInit{
-  chat?: ChatSession;
-  message = '';
-  isLoading = true;
+export class Chat implements OnInit {
+  // State converted to signals
+  chat = signal<ChatSession | undefined>(undefined);
+  message = signal('');
+  isLoading = signal(true);
+  messages = signal<{ role: string; content: string }[]>([]);
+  isSending = signal(false);
 
   constructor(
     private route: ActivatedRoute,
@@ -24,47 +27,47 @@ export class Chat implements OnInit{
 
     this.chatService.getChat(id).subscribe({
       next: chat => {
-        this.chat = chat;
-        this.isLoading = false;
+        this.chat.set(chat);
+        this.isLoading.set(false);
       },
       error: () => {
-        this.isLoading = false;
+        this.isLoading.set(false);
       }
     });
   }
 
-  messages: { role: string; content: string }[] = [];
-  isSending = false;
-
   sendMessage() {
-    const question = this.message.trim();
+    const question = this.message().trim();
+    const currentChat = this.chat();
 
-    if (!question || !this.chat || this.isSending) return;
+    if (!question || !currentChat || this.isSending()) {
+      return;
+    }
 
-    this.messages.push({
-      role: 'user',
-      content: question
-    });
+    // Add user message to the list
+    this.messages.update(prev => [
+      ...prev,
+      { role: 'user', content: question }
+    ]);
 
-    this.message = '';
-    this.isSending = true;
+    // Clear the input field
+    this.message.set('');
+    this.isSending.set(true);
 
-    this.chatService.ask(this.chat.id, question).subscribe({
+    this.chatService.ask(currentChat.id, question).subscribe({
       next: response => {
-        this.messages.push({
-          role: 'assistant',
-          content: response.answer
-        });
-
-        this.isSending = false;
+        this.messages.update(prev => [
+          ...prev,
+          { role: 'assistant', content: response.answer }
+        ]);
+        this.isSending.set(false);
       },
       error: error => {
-        this.messages.push({
-          role: 'assistant',
-          content: error.error?.error || 'خطا در دریافت پاسخ.'
-        });
-
-        this.isSending = false;
+        this.messages.update(prev => [
+          ...prev,
+          { role: 'assistant', content: error.error?.error || 'خطا در دریافت پاسخ.' }
+        ]);
+        this.isSending.set(false);
       }
     });
   }
