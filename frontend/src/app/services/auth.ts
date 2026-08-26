@@ -7,6 +7,14 @@ interface LoginResponse {
   refresh: string;
 }
 
+export interface SignupData {
+  username: string;
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+}
+
 interface User {
   id: number;
   username: string;
@@ -58,4 +66,11 @@ export class Auth {
       { refresh }
     );
   }
+
+  signup(data: SignupData): Observable<User> {
+  return this.http.post<User>(
+    `${this.apiUrl}/auth/signup/`,
+    data
+  );
+}
 }

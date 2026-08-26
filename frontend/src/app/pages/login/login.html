@@ -1,56 +1,188 @@
-<div class="container">
-  <div class="row justify-content-center mt-5">
-    <div class="col-md-5">
+<div class="container min-vh-100 d-flex align-items-center justify-content-center" dir="rtl">
 
-      <div class="card shadow-sm">
-        <div class="card-body p-4">
+  <div class="col-12 col-sm-10 col-md-6 col-lg-5">
 
-          <h3 class="text-center mb-4">Graph RAG</h3>
+    <div class="card border-0 shadow">
 
-          @if (errorMessage){
-              <div class="alert alert-danger">
-                {{ errorMessage }}
-              </div>
-          }
+      <div class="card-body p-4 p-md-5">
 
-          <form (ngSubmit)="login()">
+        <div class="text-center mb-4">
+          <div class="text-primary mb-2">
+            <i class="bi bi-diagram-3 fs-1"></i>
+          </div>
+
+          <h3 class="fw-bold mb-1">Graph RAG</h3>
+
+          <p class="text-secondary mb-0">
+            {{ isSignup ? 'ساخت حساب کاربری' : 'ورود به حساب کاربری' }}
+          </p>
+        </div>
+
+        <div class="btn-group w-100 mb-4" role="group">
+
+          <button
+            type="button"
+            class="btn"
+            [class.btn-primary]="!isSignup"
+            [class.btn-outline-primary]="isSignup"
+            (click)="switchMode(false)"
+          >
+            ورود
+          </button>
+
+          <button
+            type="button"
+            class="btn"
+            [class.btn-primary]="isSignup"
+            [class.btn-outline-primary]="!isSignup"
+            (click)="switchMode(true)"
+          >
+            ثبت‌نام
+          </button>
+
+        </div>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
+        }
+
+        @if (!isSignup) {
+
+          <form
+            [formGroup]="loginForm"
+            (ngSubmit)="login()"
+          >
 
             <div class="mb-3">
-              <label class="form-label">Username</label>
+              <label class="form-label">نام کاربری</label>
 
               <input
                 type="text"
                 class="form-control"
-                [(ngModel)]="username"
-                name="username"
-                required
+                formControlName="username"
+                placeholder="نام کاربری"
               >
             </div>
 
-            <div class="mb-3">
-              <label class="form-label">Password</label>
+            <div class="mb-4">
+              <label class="form-label">رمز عبور</label>
 
               <input
                 type="password"
                 class="form-control"
-                [(ngModel)]="password"
-                name="password"
-                required
+                formControlName="password"
+                placeholder="رمز عبور"
               >
             </div>
 
             <button
               type="submit"
               class="btn btn-primary w-100"
+              [disabled]="loginForm.invalid || isLoading"
             >
-              Login
+              @if (isLoading) {
+                <span class="spinner-border spinner-border-sm"></span>
+                <span class="ms-2">در حال ورود...</span>
+              } @else {
+                <i class="bi bi-box-arrow-in-left me-1"></i>
+                ورود
+              }
             </button>
 
           </form>
 
-        </div>
+        } @else {
+
+          <form
+            [formGroup]="signupForm"
+            (ngSubmit)="signup()"
+          >
+
+            <div class="row">
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">نام</label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="first_name"
+                  placeholder="نام"
+                >
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">نام خانوادگی</label>
+
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="last_name"
+                  placeholder="نام خانوادگی"
+                >
+              </div>
+
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">نام کاربری</label>
+
+              <input
+                type="text"
+                class="form-control"
+                formControlName="username"
+                placeholder="نام کاربری"
+              >
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">ایمیل</label>
+
+              <input
+                type="email"
+                class="form-control"
+                formControlName="email"
+                placeholder="example@email.com"
+                dir="ltr"
+              >
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">رمز عبور</label>
+
+              <input
+                type="password"
+                class="form-control"
+                formControlName="password"
+                placeholder="حداقل ۸ کاراکتر"
+                dir="ltr"
+              >
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-primary w-100"
+              [disabled]="signupForm.invalid || isLoading"
+            >
+              @if (isLoading) {
+                <span class="spinner-border spinner-border-sm"></span>
+                <span class="ms-2">در حال ثبت‌نام...</span>
+              } @else {
+                <i class="bi bi-person-plus me-1"></i>
+                ثبت‌نام
+              }
+            </button>
+
+          </form>
+
+        }
+
       </div>
 
     </div>
+
   </div>
+
 </div>
