@@ -33,10 +33,39 @@ export class Chat implements OnInit{
     });
   }
 
-  sendMessage() {
-    if (!this.message.trim() || !this.chat) return;
+  messages: { role: string; content: string }[] = [];
+  isSending = false;
 
-    console.log(this.message);
+  sendMessage() {
+    const question = this.message.trim();
+
+    if (!question || !this.chat || this.isSending) return;
+
+    this.messages.push({
+      role: 'user',
+      content: question
+    });
+
     this.message = '';
+    this.isSending = true;
+
+    this.chatService.ask(this.chat.id, question).subscribe({
+      next: response => {
+        this.messages.push({
+          role: 'assistant',
+          content: response.answer
+        });
+
+        this.isSending = false;
+      },
+      error: error => {
+        this.messages.push({
+          role: 'assistant',
+          content: error.error?.error || 'خطا در دریافت پاسخ.'
+        });
+
+        this.isSending = false;
+      }
+    });
   }
 }

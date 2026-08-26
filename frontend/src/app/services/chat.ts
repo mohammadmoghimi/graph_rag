@@ -16,6 +16,10 @@ export interface ChatSession {
   updated_at: string;
 }
 
+export interface ChatAnswer {
+  answer: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -24,17 +28,15 @@ export class ChatService {
 
   constructor(private http: HttpClient) {}
 
-  createChat(
-    title: string,
-    websiteIds: number[]
-  ): Observable<ChatSession> {
-    return this.http.post<ChatSession>(`${this.apiUrl}/`, {
-      title,
-      website_ids: websiteIds
-    });
+  createChat(title: string,websiteIds: number[]): Observable<ChatSession> {    
+    return this.http.post<ChatSession>(`${this.apiUrl}/`, {title,website_ids: websiteIds});
   }
 
   getChat(id: number): Observable<ChatSession> {
   return this.http.get<ChatSession>(`${this.apiUrl}/${id}/`);
 }
+
+  ask(id: number, question: string): Observable<ChatAnswer> {
+    return this.http.post<ChatAnswer>(`${this.apiUrl}/${id}/ask/`,{ question });
+  }
 }

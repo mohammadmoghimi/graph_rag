@@ -1,64 +1,208 @@
-<div class="container-fluid h-100" dir="rtl">
+<div class="container-fluid h-100 px-0" dir="rtl">
 
   @if (isLoading) {
-    <div class="d-flex justify-content-center align-items-center py-5">
-      <div class="spinner-border text-primary"></div>
+
+    <div class="d-flex justify-content-center align-items-center h-100">
+      <div class="text-center text-secondary">
+        <div class="spinner-border text-primary mb-3"></div>
+        <div>در حال بارگذاری گفتگو...</div>
+      </div>
     </div>
+
   } @else if (chat) {
 
     <div class="d-flex flex-column vh-100">
 
-      <div class="border-bottom py-3">
-        <h5 class="fw-semibold mb-2">{{ chat.title }}</h5>
+      <!-- Header -->
+      <div class="border-bottom bg-white px-3 px-md-4 py-3">
 
-        <div class="d-flex flex-wrap gap-2">
-          @for (website of chat.websites; track website.id) {
-            <span class="badge text-bg-light border">
-              <i class="bi bi-globe2 me-1"></i>
-              {{ website.name }}
-            </span>
-          }
+        <div class="d-flex align-items-center justify-content-between">
+
+          <div>
+            <h5 class="fw-semibold mb-2">
+              {{ chat.title }}
+            </h5>
+
+            <div class="d-flex flex-wrap gap-2">
+              @for (website of chat.websites; track website.id) {
+                <span class="badge text-bg-light border">
+                  <i class="bi bi-globe2 me-1"></i>
+                  {{ website.name }}
+                </span>
+              }
+            </div>
+          </div>
+
+          <span class="badge text-bg-success">
+            <i class="bi bi-circle-fill me-1 small"></i>
+            آنلاین
+          </span>
+
         </div>
+
       </div>
 
-      <div class="flex-grow-1 overflow-auto py-4">
+      <!-- Messages -->
+      <div class="flex-grow-1 overflow-auto px-3 px-md-5 py-4">
 
-        <div class="text-center text-secondary mt-5">
-          <i class="bi bi-chat-dots display-5"></i>
+        @if (!messages.length && !isSending) {
 
-          <h5 class="mt-3">
-            گفتگو را شروع کنید
-          </h5>
+          <div class="d-flex justify-content-center align-items-center h-100">
 
-          <p>
-            درباره محتوای وب‌سایت‌های انتخاب‌شده سؤال بپرسید.
-          </p>
-        </div>
+            <div class="text-center text-secondary">
+
+              <div
+                class="bg-primary bg-opacity-10 text-primary rounded-circle
+                       d-inline-flex align-items-center justify-content-center
+                       p-4 mb-3"
+              >
+                <i class="bi bi-chat-dots fs-1"></i>
+              </div>
+
+              <h5 class="fw-semibold text-dark">
+                گفتگو را شروع کنید
+              </h5>
+
+              <p class="mb-0">
+                درباره محتوای وب‌سایت‌های انتخاب‌شده سؤال بپرسید.
+              </p>
+
+            </div>
+
+          </div>
+
+        } @else {
+
+          <div class="d-flex flex-column gap-4">
+
+            @for (message of messages; track $index) {
+
+              <div
+                class="d-flex"
+                [class.justify-content-start]="message.role === 'user'"
+                [class.justify-content-end]="message.role === 'assistant'"
+              >
+
+                <div
+                  class="d-flex gap-2 align-items-end"
+                  [class.flex-row-reverse]="message.role === 'user'"
+                  style="max-width: 85%;"
+                >
+
+                  <!-- Avatar -->
+                  <div
+                    class="rounded-circle d-flex align-items-center
+                           justify-content-center flex-shrink-0"
+                    [class.bg-primary]="message.role === 'user'"
+                    [class.bg-light]="message.role === 'assistant'"
+                    [class.text-white]="message.role === 'user'"
+                    style="width: 36px; height: 36px;"
+                  >
+                    <i
+                      class="bi"
+                      [class.bi-person-fill]="message.role === 'user'"
+                      [class.bi-stars]="message.role === 'assistant'"
+                    ></i>
+                  </div>
+
+                  <!-- Message -->
+                  <div
+                    class="px-3 py-2 rounded-4"
+                    [class.bg-primary]="message.role === 'user'"
+                    [class.text-white]="message.role === 'user'"
+                    [class.bg-light]="message.role === 'assistant'"
+                    [class.text-dark]="message.role === 'assistant'"
+                    style="white-space: pre-wrap;"
+                  >
+                    {{ message.content }}
+                  </div>
+
+                </div>
+
+              </div>
+
+            }
+
+            @if (isSending) {
+
+              <div class="d-flex justify-content-end">
+
+                <div class="d-flex gap-2 align-items-end">
+
+                  <div
+                    class="bg-light rounded-circle d-flex align-items-center
+                           justify-content-center"
+                    style="width: 36px; height: 36px;"
+                  >
+                    <i class="bi bi-stars"></i>
+                  </div>
+
+                  <div class="bg-light px-3 py-2 rounded-4">
+
+                    <span
+                      class="spinner-grow spinner-grow-sm text-secondary"
+                    ></span>
+
+                    <span
+                      class="spinner-grow spinner-grow-sm text-secondary mx-1"
+                    ></span>
+
+                    <span
+                      class="spinner-grow spinner-grow-sm text-secondary"
+                    ></span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+        }
 
       </div>
 
-      <div class="border-top py-3">
+      <!-- Input -->
+      <div class="border-top bg-white px-3 px-md-5 py-3">
+
         <form
           class="d-flex gap-2"
           (ngSubmit)="sendMessage()"
         >
 
           <input
-            class="form-control form-control-lg"
+            type="text"
+            class="form-control form-control-lg rounded-4"
             [(ngModel)]="message"
             name="message"
-            placeholder="سؤال خود را بنویسید..."
+            placeholder="سؤال خود را درباره وب‌سایت‌ها بنویسید..."
             autocomplete="off"
+            [disabled]="isSending"
           >
 
           <button
-            class="btn btn-primary px-4"
-            [disabled]="!message.trim()"
+            type="submit"
+            class="btn btn-primary rounded-4 px-4"
+            [disabled]="!message.trim() || isSending"
           >
-            <i class="bi bi-send"></i>
+            @if (isSending) {
+              <span class="spinner-border spinner-border-sm"></span>
+            } @else {
+              <i class="bi bi-send"></i>
+            }
           </button>
 
         </form>
+
+        <div class="text-center mt-2">
+          <small class="text-secondary">
+            پاسخ‌ها بر اساس پایگاه دانش وب‌سایت‌های انتخاب‌شده تولید می‌شوند.
+          </small>
+        </div>
+
       </div>
 
     </div>
