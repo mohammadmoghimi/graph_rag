@@ -6,9 +6,6 @@
       <p class="text-secondary mb-0">پایگاه‌های دانش خود را مدیریت کنید.</p>
     </div>
 
-    <span class="badge text-bg-light border px-3 py-2">
-      {{ websites.length }} وب‌سایت
-    </span>
   </div>
 
   <div class="card border-0 shadow-sm rounded-4 mb-4">
@@ -109,7 +106,14 @@
   </div>
 
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <h5 class="fw-semibold mb-0">پایگاه‌های دانش</h5>
+    <h5 class="fw-semibold mb-0">برای شروع چت ، وب سایت های مورد نظر خود را انتخاب کنید</h5>
+    
+    <span class="badge text-bg-light border px-3 py-2">
+      {{ websites.length }} وب‌سایت
+    </span>
+    <span class="badge text-bg-light border px-3 py-2">
+      {{ selectedWebsiteIds.size  }} انتخاب شده
+    </span>
   </div>
 
   @if (isLoading) {
@@ -139,7 +143,8 @@
 
         <div class="col-12 col-md-6 col-xl-4">
 
-          <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card border-0 shadow-sm rounded-4 h-100 " 
+          [class.border-primary]="isSelected(website.id)" [class.border-2]="isSelected(website.id)">
             <div class="card-body p-4 website-card">
 
               <div class="d-flex justify-content-between align-items-start mb-3">
@@ -161,6 +166,21 @@
               <p class="text-secondary small mb-3">
                 {{ website.description || 'بدون توضیحات' }}
               </p>
+              <button
+                type="button"
+                class="btn w-100 mt-3"
+                [class.btn-success]="isSelected(website.id)"
+                [class.btn-outline-primary]="!isSelected(website.id)"
+                (click)="toggleWebsite(website.id)"
+              >
+                <i
+                  class="bi"
+                  [class.bi-check-circle-fill]="isSelected(website.id)"
+                  [class.bi-circle]="!isSelected(website.id)"
+                ></i>
+
+                {{ isSelected(website.id) ? 'انتخاب شد' : 'انتخاب برای گفتگو' }}
+              </button>
 
             </div>
           </div>
@@ -172,5 +192,17 @@
     </div>
 
   }
+
+      @if (selectedWebsiteIds.size > 0) {
+      <div class="position-fixed bottom-0 start-50 translate-middle-x mb-4 z-3">
+        <button
+          class="btn btn-primary btn-lg rounded-pill shadow px-4"
+          (click)="startChat()"
+        >
+          <i class="bi bi-chat-dots me-2"></i>
+          گفتگو با {{ selectedWebsiteIds.size }} وب‌سایت
+        </button>
+      </div>
+    }
 
 </div>

@@ -1,3 +1,4 @@
+import { ChatService } from './../../services/chat';
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
@@ -6,6 +7,7 @@ import {
   Validators
 } from '@angular/forms';
 import { Website, WebsiteService } from '../../services/website';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-websites',
@@ -15,6 +17,7 @@ import { Website, WebsiteService } from '../../services/website';
   styleUrl: './websites.scss'
 })
 export class Websites implements OnInit {
+
   websiteForm!: FormGroup;
   websites: Website[] = [];
   isCrawling = false;
@@ -24,7 +27,9 @@ export class Websites implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private websiteService: WebsiteService
+    private websiteService: WebsiteService,
+    private chatService : ChatService,
+    private router : Router
   ) {}
 
   ngOnInit() {
@@ -91,8 +96,45 @@ export class Websites implements OnInit {
   }
 
   truncateUrl(url: string): string {
-    const maxLength = 40;
+    const maxLength = 30;
     if (!url) return '';
     return url.length > maxLength ? url.substring(0, maxLength) + '...' : url;
+  }
+
+  selectedWebsiteIds = new Set<number>();
+
+  toggleWebsite(id: number) {
+    this.selectedWebsiteIds.has(id)
+      ? this.selectedWebsiteIds.delete(id)
+      : this.selectedWebsiteIds.add(id);
+  }
+
+  isSelected(id: number) {
+    return this.selectedWebsiteIds.has(id);
+  }
+
+  startChat() {
+    const websiteIds = [...this.selectedWebsiteIds];
+    console.log(websiteIds , 'website ids');
+    
+    if (!websiteIds.length) return;
+
+    this.chatService.createChat(
+      'گفتگو با وب‌سایت‌ها',
+      websiteIds
+    ).subscribe({
+      next: chat => {
+        console.log('success');
+        
+        this.selectedWebsiteIds.clear();
+        this.router.navigate(['/chats', chat.id]);
+      },
+      error: error => {
+        this.errorMessage =
+          error.error?.detail ||
+          error.error?.error ||
+          'خطا در ایجاد گفتگو.';
+      }
+    });
   }
 }

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Dashboard } from './dashboard';
 import { Websites } from '../websites/websites';
+import { Chat } from '../chat/chat';
 
 export const DASHBOARD_ROUTES: Routes = [
   {
@@ -12,6 +13,10 @@ export const DASHBOARD_ROUTES: Routes = [
         path: 'websites',
         component: Websites,
       },
+      {
+        path:'chats/:id',
+        component:Chat
+      }
     ],
   },
 ];
