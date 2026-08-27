@@ -26,7 +26,16 @@ export class Chat implements OnInit {
   ngOnInit() {
     this.loadChats();
 
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id'));
+      this.getChat(id);
+    });
+  }
+
+  private getChat(id: number) {
+    this.isLoading.set(true);
+    this.chat.set(undefined);
+    this.messages.set([]);
 
     this.chatService.getChat(id).subscribe({
       next: chat => {
