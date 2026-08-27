@@ -11,4 +11,5 @@ urlpatterns = [
     path("api/auth/me/", CurrentUserView.as_view()),
     path("api/chats/", include("chat.urls")),
     path("api/auth/signup/", SignupView.as_view()),
+    path("api/users/", include("users.urls")),
 ]

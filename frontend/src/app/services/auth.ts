@@ -15,7 +15,7 @@ export interface SignupData {
   last_name: string;
 }
 
-interface User {
+export interface User {
   id: number;
   username: string;
   email: string;

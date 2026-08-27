@@ -3,7 +3,8 @@ import { Auth } from '../../services/auth';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ChatService, ChatSession } from '../../services/chat';
 import { filter } from 'rxjs';
-
+// import { AdminUser } from '../../services/user';
+import {User} from '../../services/auth'
 @Component({
   selector: 'app-dashboard',
   imports: [RouterLink, RouterLinkActive, RouterOutlet],
@@ -15,7 +16,8 @@ export class Dashboard {
   isChatsExpanded = false;
   chats = signal<ChatSession[]>([]);
   activeChatId = signal<number | null>(null);
-
+  currentUser = signal<User | null>(null);
+  
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
@@ -28,6 +30,7 @@ export class Dashboard {
   ) {}
   
   ngOnInit() {
+    this.getCurrentUser();
     this.loadChats();
 
     this.setActiveChatFromRoute();
@@ -37,6 +40,13 @@ export class Dashboard {
       .subscribe(() => {
         this.setActiveChatFromRoute();
       });
+  }
+
+  getCurrentUser() {
+    this.authService.getCurrentUser().subscribe({
+      next: user => this.currentUser.set(user) ,
+      complete: () => console.log('Current user loaded' , this.currentUser())
+    });
   }
 
   loadChats() {

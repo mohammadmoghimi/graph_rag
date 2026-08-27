@@ -75,6 +75,16 @@
         }
 
       </div>
+      @if (currentUser()?.role === 'admin') {
+        <a
+          class="nav-link"
+          routerLink="users"
+          routerLinkActive="active"
+        >
+          <i class="bi bi-people"></i>
+          <span>کاربران</span>
+        </a>
+      }
 
       <button
         class="btn btn-danger mt-auto mb-3 mx-3"
