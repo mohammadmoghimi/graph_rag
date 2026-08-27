@@ -6,7 +6,7 @@ from rest_framework import status
 from .models import ChatMessage, ChatSession
 from .serializers import ChatSessionSerializer
 from rest_framework.decorators import action
-
+from knowledge.guardrails.prompt_guard import PromptBlockedError, PromptGuard
 
 class ChatSessionViewSet(viewsets.ModelViewSet):
     serializer_class = ChatSessionSerializer
@@ -31,6 +31,15 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
                 {"error": "Question is required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+        if request.user.role and request.user.role.name != "admin":
+            try:
+                PromptGuard.check(question)
+            except PromptBlockedError as error:
+                return Response(
+                    {"error": str(error)},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         website_ids = list(
             chat.websites.values_list("id", flat=True)
