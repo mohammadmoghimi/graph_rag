@@ -45,7 +45,7 @@
       <!-- Messages -->
       <div class="flex-grow-1 overflow-auto px-3 px-md-5 py-4">
 
-        @if (!messages.length && !isSending) {
+        @if (!messages().length && !isSending()) {
 
           <div class="d-flex justify-content-center align-items-center h-100">
 
@@ -186,7 +186,7 @@
           <button
             type="submit"
             class="btn btn-primary rounded-4 px-4"
-            [disabled]="!message().trim() || isSending"
+            [disabled]="!message().trim() || isSending()"
           >
             @if (isSending()) {
               <span class="spinner-border spinner-border-sm"></span>
