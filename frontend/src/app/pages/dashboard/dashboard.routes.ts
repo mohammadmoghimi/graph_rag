@@ -16,7 +16,7 @@ export const DASHBOARD_ROUTES: Routes = [
       {
         path:'chats/:id',
         component:Chat
-      }
+      },
     ],
   },
 ];

@@ -8,10 +8,18 @@ export interface ChatWebsite {
   url: string;
 }
 
+export interface ChatMessage {
+  id: number;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+}
+
 export interface ChatSession {
   id: number;
   title: string;
   websites: ChatWebsite[];
+  messages: ChatMessage[];
   created_at: string;
   updated_at: string;
 }
@@ -27,6 +35,10 @@ export class ChatService {
   private apiUrl = 'http://127.0.0.1:8000/api/chats';
 
   constructor(private http: HttpClient) {}
+
+  getChats(): Observable<ChatSession[]> {
+    return this.http.get<ChatSession[]>(`${this.apiUrl}/`);
+  }
 
   createChat(title: string,websiteIds: number[]): Observable<ChatSession> {    
     return this.http.post<ChatSession>(`${this.apiUrl}/`, {title,website_ids: websiteIds});

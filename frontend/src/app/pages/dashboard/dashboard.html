@@ -21,10 +21,59 @@
         <span>وب‌سایت‌ها</span>
       </a>
 
-      <a class="nav-link disabled">
-        <i class="bi bi-chat-dots"></i>
-        <span>گفتگوها</span>
-      </a>
+      <div class="chat-section">
+
+        <button
+          type="button"
+          class="nav-link chat-toggle w-100 border-0 text-end"
+          (click)="toggleChats()"
+        >
+          <i class="bi bi-chat-dots"></i>
+
+          <span>گفتگوها</span>
+
+          <i
+            class="bi me-auto"
+            [class.bi-chevron-down]="!isChatsExpanded"
+            [class.bi-chevron-up]="isChatsExpanded"
+          ></i>
+        </button>
+
+        @if (isChatsExpanded) {
+
+          <div class="chat-list">
+
+            @if (chats().length === 0) {
+
+              <div class="text-center text-secondary small py-3">
+                گفتگویی وجود ندارد.
+              </div>
+
+            } @else {
+
+              @for (chat of chats(); track chat.id) {
+
+                <button
+                  type="button"
+                  class="chat-item w-100 border-0 text-end"
+                  (click)="openChat(chat.id)"
+                >
+                  <i class="bi bi-chat-left-text"></i>
+
+                  <span class="text-truncate">
+                    {{ chat.title }}
+                  </span>
+                </button>
+
+              }
+
+            }
+
+          </div>
+
+        }
+
+      </div>
 
       <button
         class="btn btn-danger mt-auto mb-3 mx-3"
