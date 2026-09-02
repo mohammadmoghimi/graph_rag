@@ -1,85 +1,112 @@
 from langchain_core.documents import Document
-
 from .graph import Neo4jClient
-
+from .entity_extractor import EntityExtractor
+from .reranker import Reranker
 
 class GraphRetriever:
-    def __init__(self, retriever, website_ids):
+    def __init__(self, retriever, website_ids, k=5):
         self.retriever = retriever
         self.website_ids = website_ids
+        self.k = k
+        self.reranker = Reranker()
 
     def retrieve(self, query):
-        documents = self.retriever.invoke(query)
-
-        chunk_ids = [
-            document.metadata["chunk_id"]
-            for document in documents
-            if "chunk_id" in document.metadata
-        ]
+        elastic_docs = self.retriever.invoke(query)
+        # entities = EntityExtractor().extract(query)
 
         graph = Neo4jClient()
 
         try:
-            graph_data = graph.get_chunk_graph(chunk_ids,self.website_ids)
+            # print("QUERY ENTITIES:", entities)
+
+            graph_chunk_ids = graph.get_chunks_by_query(
+                query,
+                self.website_ids
+            )
+
+            print("GRAPH CHUNK IDS:", graph_chunk_ids)
+            print("ELASTIC:", [
+                d.metadata.get("chunk_id")
+                for d in elastic_docs
+            ])
+
         finally:
             graph.close()
 
-        return self._build_context(documents, graph_data)
+        graph_docs = self._get_graph_documents(graph_chunk_ids)
 
-    def _build_context(self, documents, graph_data):
-        graph_by_chunk = {
-            item["chunk_id"]: item
-            for item in graph_data
-        }
+        candidates = self._rrf(elastic_docs, graph_docs)
 
-        results = []
+        print("GRAPH DOCS:", [
+            d.metadata.get("chunk_id")
+            for d in graph_docs
+        ])
 
-        for document in documents:
+        print("RRF:", [
+            d.metadata.get("chunk_id")
+            for d in candidates
+        ])
+
+        final_docs = self.reranker.rerank(
+            query,
+            candidates,
+            top_k=self.k
+        )
+
+        print("RERANKED:", [
+            d.metadata.get("chunk_id")
+            for d in final_docs
+        ])
+
+        return final_docs
+
+    def _get_graph_documents(self, chunk_ids):
+        if not chunk_ids:
+            return []
+
+        response = self.retriever.es_client.search(
+            index=self.retriever.index_name,
+            query={
+                "terms": {
+                    "metadata.chunk_id.keyword": chunk_ids
+                }
+            },
+            size=len(chunk_ids),
+            _source=["text", "metadata"]
+        )
+
+        return [
+            Document(
+                page_content=hit["_source"].get("text", ""),
+                metadata=hit["_source"].get("metadata", {})
+            )
+            for hit in response["hits"]["hits"]
+        ]
+
+    def _rrf(self, elastic_docs, graph_docs):
+        scores = {}
+        documents = {}
+
+        for rank, document in enumerate(elastic_docs, 1):
             chunk_id = document.metadata.get("chunk_id")
+            if not chunk_id:
+                continue
 
-            results.append(
-                Document(
-                    page_content=self._build_text(
-                        document,
-                        graph_by_chunk.get(chunk_id)
-                    ),
-                    metadata=document.metadata
-                )
-            )
+            scores[chunk_id] = scores.get(chunk_id, 0) + 1 / (60 + rank)
+            documents[chunk_id] = document
 
-        return results
+        for rank, document in enumerate(graph_docs, 1):
+            chunk_id = document.metadata.get("chunk_id")
+            if not chunk_id:
+                continue
 
-    def _build_text(self, document, graph_data):
-        if not graph_data:
-            return document.page_content
+            scores[chunk_id] = scores.get(chunk_id, 0) + 1 / (60 + rank)
+            documents[chunk_id] = document
 
-        entities = graph_data["entities"]
-        related = graph_data["related_entities"]
-        communities = graph_data["communities"]
+        ranked = sorted(
+            scores,
+            key=scores.get,
+            reverse=True
+        )[:self.k]
 
-        context = document.page_content
-
-        if entities:
-            context += "\n\nEntities:\n"
-            context += "\n".join(
-                f"- {entity['name']} ({entity['type']})"
-                for entity in entities
-            )
-
-        if related:
-            context += "\n\nRelated entities:\n"
-            context += "\n".join(
-                f"- {entity['name']} ({entity['type']})"
-                for entity in related
-                if entity["name"]
-            )
-
-        if communities:
-            context += "\n\nCommunity summaries:\n"
-            context += "\n".join(
-                f"- {community['summary']}"
-                for community in communities
-                if community["summary"]
-            )
-
-        return context
+        return [documents[chunk_id] for chunk_id in ranked]

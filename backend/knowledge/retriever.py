@@ -3,12 +3,13 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
 from elasticsearch import Elasticsearch
+from typing import Any
 
 class ElasticsearchHybridRetriever(BaseRetriever):
 
     es_client: Elasticsearch
     index_name: str
-    embedding_model: any
+    embedding_model: Any
     website_ids: list[int] = []
     text_field: str = "text"
     embedding_field: str = "vector"
@@ -70,18 +71,22 @@ class ElasticsearchHybridRetriever(BaseRetriever):
         combined_scores = {}
         doc_store = {} 
 
-        for hit in bm25_hits:
+        for rank, hit in enumerate(bm25_hits, 1):
             doc_id = hit["_id"]
             score = hit["_score"]
-            combined_scores[doc_id] = combined_scores.get(doc_id, 0) + (1 / (self.k + 1))
+            combined_scores[doc_id] = combined_scores.get(doc_id, 0) + (
+                self.bm25_weight / (60 + rank)
+            )
             doc_store[doc_id] = {
                 "text": hit["_source"].get(self.text_field, ""),
                 "metadata": hit["_source"].get("metadata", {})
             }
 
-        for hit in knn_hits:
+        for rank, hit in enumerate(knn_hits, 1):
             doc_id = hit["_id"]
-            combined_scores[doc_id] = combined_scores.get(doc_id, 0) + (1 / (self.k + 1))
+            combined_scores[doc_id] = combined_scores.get(doc_id, 0) + (
+                self.bm25_weight / (60 + rank)
+            )
             if doc_id not in doc_store:
                 doc_store[doc_id] = {
                     "text": hit["_source"].get(self.text_field, ""),
@@ -100,3 +105,5 @@ class ElasticsearchHybridRetriever(BaseRetriever):
                 )
             )
         return documents
+    
+    

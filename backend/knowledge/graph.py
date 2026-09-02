@@ -1,6 +1,6 @@
 from neo4j import GraphDatabase
 from django.conf import settings
-
+from rapidfuzz import process, fuzz
 
 class Neo4jClient:
     def __init__(self):
@@ -111,6 +111,102 @@ class Neo4jClient:
             )
 
             return [record.data() for record in result]
+        
+    def get_chunks_by_entities(self, entities, website_ids):
+        with self.driver.session() as session:
+            result = session.run(
+                """
+                MATCH (website:Website)-[:HAS_CHUNK]->(chunk:Chunk)
+                MATCH (chunk)-[:MENTIONS]->(entity:Entity)
+                WHERE website.id IN $website_ids
+                RETURN DISTINCT entity.name AS name, entity.type AS type
+                """,
+                website_ids=website_ids
+            )
+
+            graph_entities = [
+                {"name": r["name"], "type": r["type"]}
+                for r in result
+            ]
+
+        matched = []
+
+        for entity in entities:
+            candidates = [
+                e for e in graph_entities
+                if e["type"] == entity["type"]
+            ]
+
+            match = process.extractOne(
+                entity["text"],
+                [e["name"] for e in candidates],
+                scorer=fuzz.ratio,
+                score_cutoff=60
+            )
+
+            if match:
+                matched.append(match[0])
+
+        if not matched:
+            return []
+
+        with self.driver.session() as session:
+            result = session.run(
+                """
+                MATCH (website:Website)-[:HAS_CHUNK]->(chunk:Chunk)
+                MATCH (chunk)-[:MENTIONS]->(entity:Entity)
+                WHERE website.id IN $website_ids
+                AND entity.name IN $entities
+
+                RETURN DISTINCT chunk.id AS chunk_id
+                """,
+                website_ids=website_ids,
+                entities=matched
+            )
+
+            return [record["chunk_id"] for record in result]
+        
+    def get_chunks_by_query(self, query, website_ids):
+        with self.driver.session() as session:
+            result = session.run(
+                """
+                MATCH (website:Website)-[:HAS_CHUNK]->(chunk:Chunk)
+                MATCH (chunk)-[:MENTIONS]->(entity:Entity)
+                WHERE website.id IN $website_ids
+                RETURN DISTINCT entity.name AS name
+                """,
+                website_ids=website_ids
+            )
+
+            entity_names = [r["name"] for r in result]
+
+        matches = process.extract(
+            query,
+            entity_names,
+            scorer=fuzz.partial_ratio,
+            limit=5,
+            score_cutoff=60
+        )
+
+        matched_names = [match[0] for match in matches]
+
+        if not matched_names:
+            return []
+
+        with self.driver.session() as session:
+            result = session.run(
+                """
+                MATCH (website:Website)-[:HAS_CHUNK]->(chunk:Chunk)
+                MATCH (chunk)-[:MENTIONS]->(entity:Entity)
+                WHERE website.id IN $website_ids
+                AND entity.name IN $matched_names
+                RETURN DISTINCT chunk.id AS chunk_id
+                """,
+                website_ids=website_ids,
+                matched_names=matched_names
+            )
+
+            return [r["chunk_id"] for r in result]
 
 
     @staticmethod

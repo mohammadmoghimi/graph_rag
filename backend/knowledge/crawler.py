@@ -5,6 +5,7 @@ from urllib.parse import urljoin, urlparse, urldefrag
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from requests.adapters import HTTPAdapter
 from langchain_core.documents import Document
+from trafilatura import extract
 
 
 def normalize_url(url):
@@ -54,19 +55,31 @@ def extract_links(html, url, domain, visited):
     return links
 
 
+# def extract_content(html, url):
+#     soup = BeautifulSoup(html, "lxml")
+
+#     for tag in soup.select(
+#         "script, style, noscript, nav"
+#     ):
+#         tag.decompose()
+
+#     return Document(
+#         page_content=soup.get_text(" ", strip=True),
+#         metadata={"source_url": url}
+#     )
+
+
 def extract_content(html, url):
-    soup = BeautifulSoup(html, "lxml")
-
-    for tag in soup.select(
-        "script, style, noscript, nav"
-    ):
-        tag.decompose()
-
+    # Trafilatura automatically extracts the main content
+    text = extract(html, include_comments=False, include_tables=False)
+    
+    if not text:
+        return None  # No main content found
+    
     return Document(
-        page_content=soup.get_text(" ", strip=True),
+        page_content=text,
         metadata={"source_url": url}
     )
-
 
 def fetch_page(url, session, domain, visited, delay, timeout):
     try:
