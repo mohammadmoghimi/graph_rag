@@ -83,30 +83,24 @@ class GraphRetriever:
             for hit in response["hits"]["hits"]
         ]
 
-    def _rrf(self, elastic_docs, graph_docs):
+    def _rrf(self, elastic_docs, graph_docs, k=60):
         scores = {}
         documents = {}
 
-        for rank, document in enumerate(elastic_docs, 1):
-            chunk_id = document.metadata.get("chunk_id")
-            if not chunk_id:
-                continue
+        for rank, doc in enumerate(elastic_docs, start=1):
+            doc_id = doc.metadata["chunk_id"]
+            scores[doc_id] = scores.get(doc_id, 0) + 1 / (rank + k)
+            documents[doc_id] = doc
 
-            scores[chunk_id] = scores.get(chunk_id, 0) + 1 / (60 + rank)
-            documents[chunk_id] = document
+        for rank, doc in enumerate(graph_docs, start=1):
+            doc_id = doc.metadata["chunk_id"]
+            scores[doc_id] = scores.get(doc_id, 0) + 1 / (rank + k)
+            documents[doc_id] = doc
 
-        for rank, document in enumerate(graph_docs, 1):
-            chunk_id = document.metadata.get("chunk_id")
-            if not chunk_id:
-                continue
-
-            scores[chunk_id] = scores.get(chunk_id, 0) + 1 / (60 + rank)
-            documents[chunk_id] = document
-
-        ranked = sorted(
+        ranked_ids = sorted(
             scores,
             key=scores.get,
             reverse=True
-        )[:self.k]
+        )
 
-        return [documents[chunk_id] for chunk_id in ranked]
+        return [documents[doc_id] for doc_id in ranked_ids]
