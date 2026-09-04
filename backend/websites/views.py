@@ -50,11 +50,18 @@ class WebsiteViewSet(viewsets.ModelViewSet):
         )
 
         try:
-            documents, chunks = process_website(website, crawl)
+            process_website(website, crawl)
+
+            website.status = "completed"
+            website.save(update_fields=["status", "updated_at"])
+
         except Exception as e:
             crawl.status = "failed"
             crawl.error_message = str(e)
             crawl.save()
+            
+            website.status = "failed"
+            website.save(update_fields=["status", "updated_at"])
 
             return Response(
                 {"error": str(e)},
