@@ -59,7 +59,7 @@ class WebsiteViewSet(viewsets.ModelViewSet):
             crawl.status = "failed"
             crawl.error_message = str(e)
             crawl.save()
-            
+
             website.status = "failed"
             website.save(update_fields=["status", "updated_at"])
 
@@ -93,3 +93,14 @@ class WebsiteViewSet(viewsets.ModelViewSet):
         return Response(
             CrawlSerializer(crawls, many=True).data
         )
+    
+    def update(self, request, *args, **kwargs):
+        website = self.get_object()
+
+        if website.status != "completed":
+            return Response(
+                {"error": "Only successfully crawled websites can be edited."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return super().update(request, *args, **kwargs)

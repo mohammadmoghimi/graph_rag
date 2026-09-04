@@ -3,16 +3,18 @@ import { Component, OnInit, signal, WritableSignal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
 import { Website, WebsiteService } from '../../services/website';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-websites',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FormsModule],
   templateUrl: './websites.html',
   styleUrl: './websites.scss'
 })
@@ -25,6 +27,10 @@ export class Websites implements OnInit {
   errorMessage = signal('');
   successMessage = signal('');
   selectedWebsiteIds = signal<Set<number>>(new Set());
+  editingWebsite = signal<Website | null>(null);
+  editName = '';
+  editDescription = '';
+  openMenu = signal<number | null>(null);
 
   constructor(
     private formBuilder: FormBuilder,
@@ -98,12 +104,57 @@ export class Websites implements OnInit {
     });
   }
 
+  editWebsite(website: Website) {
+  this.editingWebsite.set(website);
+  this.editName = website.name;
+  this.editDescription = website.description || '';
+}
+
+  saveWebsite() {
+    const website = this.editingWebsite();
+
+    if (!website || !this.editName.trim()) return;
+
+    this.websiteService.updateWebsite(website.id, {
+      name: this.editName.trim(),
+      description: this.editDescription.trim()
+    }).subscribe({
+      next: updated => {
+        this.websites.update(websites =>
+          websites.map(w => w.id === updated.id ? updated : w)
+        );
+        this.editingWebsite.set(null);
+      }
+    });
+  }
+
+  cancelEdit() {
+    this.editingWebsite.set(null);
+  }
+
+  deleteWebsite(id: number) {
+    if (!confirm('آیا از حذف این وب‌سایت مطمئن هستید؟')) return;
+
+    this.websiteService.deleteWebsite(id).subscribe({
+      next: (res) => {
+        console.log(res);
+        
+        this.websites.update(websites =>
+          websites.filter(w => w.id !== id)
+        );
+      }
+    });
+  }
+
   truncateUrl(url: string): string {
     const maxLength = 30;
     if (!url) return '';
     return url.length > maxLength ? url.substring(0, maxLength) + '...' : url;
   }
 
+  toggleMenu(id: number) {
+  this.openMenu.update(current => current === id ? null : id);
+  }
 
   toggleWebsite(id: number) {
     this.selectedWebsiteIds.update(set => {

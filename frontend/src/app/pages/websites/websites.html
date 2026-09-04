@@ -138,15 +138,22 @@
   } @else {
 
     <div class="row g-3">
-
       @for (website of websites(); track website.id) {
 
         <div class="col-12 col-md-6 col-xl-4">
+          <div
+            class="card border-0 shadow-sm h-100"
+            [class.border-primary]="isSelected(website.id)"
+            [class.border-danger]="website.status === 'failed'"
+            [class.border-2]="isSelected(website.id) || website.status === 'failed'"
+          >
 
-          <div class="card border-0 shadow-sm rounded-4 h-100 " 
-          [class.border-primary]="isSelected(website.id)" [class.border-2]="isSelected(website.id)">
-            <div class="card-body p-4 website-card">
-
+            <div
+              class="card-body p-4 website-card position-relative"
+              [class.selected]="isSelected(website.id)"
+              [class.border-danger]="website.status === 'failed'"
+              (click)="website.status !== 'failed' && toggleWebsite(website.id)"
+            >
               <div class="d-flex justify-content-between align-items-start mb-3">
 
                 <div class="d-flex align-items-center gap-3">
@@ -161,32 +168,55 @@
                     </small>
                   </div>
                 </div>
+
+                <div class="d-flex flex-column gap-2" (click)="$event.stopPropagation()">
+
+                  @if (website.status === 'completed' || website.status === 'pending') {
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-light rounded-circle"
+                      (click)="editWebsite(website)"
+                      title="ویرایش"
+                    >
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                  }
+
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light text-danger rounded-circle"
+                    (click)="deleteWebsite(website.id)"
+                    title="حذف"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+
+                </div>
+
               </div>
 
-              <p class="text-secondary small mb-3">
+              <p class="text-secondary small mb-0">
                 {{ website.description || 'بدون توضیحات' }}
               </p>
-              <button
-                type="button"
-                class="btn w-100 mt-3"
-                [class.btn-success]="isSelected(website.id)"
-                [class.btn-outline-primary]="!isSelected(website.id)"
-                (click)="toggleWebsite(website.id)"
-              >
-                <i
-                  class="bi"
-                  [class.bi-check-circle-fill]="isSelected(website.id)"
-                  [class.bi-circle]="!isSelected(website.id)"
-                ></i>
 
-                {{ isSelected(website.id) ? 'انتخاب شد' : 'انتخاب برای گفتگو' }}
-              </button>
+              @if (website.status === 'failed') {
+                <div class="mt-3">
+                  <span class="badge text-bg-danger">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    پردازش ناموفق
+                  </span>
+                </div>
+              }
 
+              @if (isSelected(website.id)) {
+                <div class="mt-3 text-success small fw-semibold">
+                  <i class="bi bi-check-circle-fill me-1"></i>
+                  انتخاب شده برای گفتگو
+                </div>
+              }
             </div>
           </div>
-
         </div>
-
       }
 
     </div>
@@ -206,3 +236,56 @@
     }
 
 </div>
+
+
+@if (editingWebsite()) {
+  <div class="modal d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+
+        <div class="modal-header">
+          <h5 class="modal-title">ویرایش وب‌سایت</h5>
+          <button type="button" class="btn-close" (click)="cancelEdit()"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <div class="mb-3">
+            <label class="form-label">نام وب‌سایت</label>
+            <input
+              class="form-control"
+              [(ngModel)]="editName"
+            >
+          </div>
+
+          <div>
+            <label class="form-label">توضیحات</label>
+            <textarea
+              class="form-control"
+              rows="4"
+              [(ngModel)]="editDescription"
+            ></textarea>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-light" (click)="cancelEdit()">
+            انصراف
+          </button>
+
+          <button
+            class="btn btn-primary"
+            [disabled]="!editName.trim()"
+            (click)="saveWebsite()"
+          >
+            ذخیره تغییرات
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop fade show"></div>
+}

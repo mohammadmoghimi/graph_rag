@@ -58,14 +58,16 @@ export class WebsiteService {
     );
   }
 
-  deleteWebsite(id: number): Observable<void> {
-    return this.http.delete<void>(
-      `${this.apiUrl}/${id}/`
-    );
+  updateWebsite(id: number, data: { name: string; description: string }): Observable<Website> {
+    return this.http.patch<Website>(`${this.apiUrl}/${id}/`, data);
   }
 
-crawlWebsite(name: string , url:string , description:string):Observable<CrawlResponse> {
-  return this.http.post<CrawlResponse>(`${this.apiUrl}/crawl/`,{name, url , description});
-}
+  deleteWebsite(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}/`);
+  }
+
+  crawlWebsite(name: string , url:string , description:string):Observable<CrawlResponse> {
+    return this.http.post<CrawlResponse>(`${this.apiUrl}/crawl/`,{name, url , description});
+  }
   
 }
