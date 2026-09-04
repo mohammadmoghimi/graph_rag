@@ -13,10 +13,12 @@ class WebsiteViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role.name == "admin":
-            return Website.objects.all()
+        queryset = Website.objects.exclude(status="deleted")
 
-        return Website.objects.filter(user=self.request.user)
+        if self.request.user.role.name != "admin":
+            queryset = queryset.filter(user=self.request.user)
+
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -25,6 +27,20 @@ class WebsiteViewSet(viewsets.ModelViewSet):
     def crawl(self, request):
         serializer = WebsiteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        url = serializer.validated_data["url"]
+
+        existing = Website.objects.filter(
+            user=request.user,
+            url=url,
+            status__in=["pending", "crawling", "completed", "failed"]
+        ).first()
+
+        if existing:
+            return Response(
+                {"error": "این وب‌سایت قبلاً اضافه شده است."},
+                status=status.HTTP_409_CONFLICT
+            )
 
         website = serializer.save(user=request.user)
 
@@ -35,7 +51,6 @@ class WebsiteViewSet(viewsets.ModelViewSet):
 
         try:
             documents, chunks = process_website(website, crawl)
-
         except Exception as e:
             crawl.status = "failed"
             crawl.error_message = str(e)
@@ -53,14 +68,20 @@ class WebsiteViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_201_CREATED
         )
-    
+
+    def destroy(self, request, *args, **kwargs):
+        website = self.get_object()
+
+        website.status = "deleted"
+        website.save(update_fields=["status", "updated_at"])
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     @action(detail=True, methods=["get"])
     def crawls(self, request, pk=None):
         website = self.get_object()
 
-        crawls = Crawl.objects.filter(
-            website=website
-        ).order_by("-created_at")
+        crawls = website.crawls.order_by("-created_at")
 
         return Response(
             CrawlSerializer(crawls, many=True).data

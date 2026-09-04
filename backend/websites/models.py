@@ -29,10 +29,7 @@ class Website(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(
-                fields=["user", "url"],
-                name="unique_user_website"
-            )
+
         ]
 
     def __str__(self):
@@ -45,6 +42,7 @@ class Crawl(models.Model):
         ("running", "Running"),
         ("completed", "Completed"),
         ("failed", "Failed"),
+        ("deleted", "Deleted"),
     ]
 
     website = models.ForeignKey(
