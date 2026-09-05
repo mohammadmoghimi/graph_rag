@@ -6,7 +6,8 @@ from rest_framework import status
 from .models import ChatMessage, ChatSession
 from .serializers import ChatSessionSerializer
 from rest_framework.decorators import action
-from knowledge.guardrails.prompt_guard import PromptBlockedError, PromptGuard
+from .guardrail_service import GuardrailService
+from backend.knowledge.guardrail_service import guardrail_service
 
 class ChatSessionViewSet(viewsets.ModelViewSet):
     serializer_class = ChatSessionSerializer
@@ -32,12 +33,10 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        if request.user.role and request.user.role.name != "admin":
-            try:
-                PromptGuard.check(question)
-            except PromptBlockedError as error:
+        if request.user.role.name != "admin":
+            if not guardrail_service.is_allowed(question):
                 return Response(
-                    {"error": str(error)},
+                    {"error": "این درخواست مجاز نیست."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
