@@ -6,8 +6,7 @@ from rest_framework import status
 from .models import ChatMessage, ChatSession
 from .serializers import ChatSessionSerializer
 from rest_framework.decorators import action
-from .guardrail_service import GuardrailService
-from backend.knowledge.guardrail_service import guardrail_service
+from knowledge.guardrail_service import guardrail_service
 
 class ChatSessionViewSet(viewsets.ModelViewSet):
     serializer_class = ChatSessionSerializer
