@@ -174,8 +174,16 @@ export class Websites implements OnInit {
     
     if (!websiteIds.length) return;
 
+  const selectedWebsites = this.websites().filter(w =>
+    websiteIds.includes(w.id)
+  );
+
+  const title = selectedWebsites.length <= 2
+    ? selectedWebsites.map(w => w.name).join(' و ')
+    : `${selectedWebsites[0].name}، ${selectedWebsites[1].name} و ${selectedWebsites.length - 2} وب‌سایت دیگر`;
+
     this.chatService.createChat(
-      'گفتگو با وب‌سایت‌ها',
+      title,
       websiteIds
     ).subscribe({
       next: chat => {

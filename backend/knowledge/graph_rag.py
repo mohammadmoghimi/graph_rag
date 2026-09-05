@@ -18,6 +18,7 @@ class GraphRAG:
             f"{message['role']}: {message['content']}"
             for message in history
         )
+        print('context' , context)
 
 
         prompt = f"""
