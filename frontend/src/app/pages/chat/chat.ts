@@ -1,11 +1,13 @@
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
-import { ChatService, ChatSession } from '../../services/chat';
+import { Component, ElementRef, OnInit, signal, viewChild, WritableSignal } from '@angular/core';
+import { ChatGraph, ChatService, ChatSession } from '../../services/chat';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import cytoscape from 'cytoscape';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-chat',
-  imports: [FormsModule],
+  imports: [FormsModule,CommonModule],
   templateUrl: './chat.html',
   styleUrl: './chat.scss',
 })
@@ -16,6 +18,10 @@ export class Chat implements OnInit {
   isLoading = signal(true);
   messages = signal<ChatSession['messages']>([]);
   isSending = signal(false);
+  showGraph = signal(false);
+  graph = signal<ChatGraph | null>(null);
+  chatId!: number;
+  graphContainer = viewChild<ElementRef<HTMLDivElement>>('graphContainer');
 
   constructor(
     private route: ActivatedRoute,
@@ -27,8 +33,8 @@ export class Chat implements OnInit {
     this.loadChats();
 
     this.route.paramMap.subscribe(params => {
-      const id = Number(params.get('id'));
-      this.getChat(id);
+      this.chatId = Number(params.get('id'));
+      this.getChat(this.chatId);
     });
   }
 
@@ -96,6 +102,54 @@ export class Chat implements OnInit {
         ]);
 
         this.isSending.set(false);
+      }
+    });
+  }
+
+  toggleGraph(): void {
+    this.showGraph.update(value => !value);
+
+    if (this.showGraph() && !this.graph()) {
+      this.chatService.getGraph(this.chatId).subscribe({
+        next: graph => {
+          this.graph.set(graph);
+
+          setTimeout(() => this.renderGraph());
+        }
+      });
+    }
+  }
+
+
+  private renderGraph(): void {
+    const container = this.graphContainer()?.nativeElement;
+    const graph = this.graph();
+
+    if (!container || !graph) {
+      return;
+    }
+
+    cytoscape({
+      container,
+      elements: [
+        ...graph.nodes.map(node => ({
+          data: {
+            id: node.id,
+            label: node.label,
+            type: node.type
+          }
+        })),
+        ...graph.edges.map((edge, index) => ({
+          data: {
+            id: `edge-${index}`,
+            source: edge.source,
+            target: edge.target,
+            label: edge.label
+          }
+        }))
+      ],
+      layout: {
+        name: 'cose'
       }
     });
   }

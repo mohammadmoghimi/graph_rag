@@ -28,6 +28,23 @@ export interface ChatAnswer {
   answer: string;
 }
 
+export interface GraphNode {
+  id: string;
+  label: string;
+  type: string;
+}
+
+export interface GraphEdge {
+  source: string;
+  target: string;
+  label: string;
+}
+
+export interface ChatGraph {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -50,5 +67,9 @@ export class ChatService {
 
   ask(id: number, question: string): Observable<ChatAnswer> {
     return this.http.post<ChatAnswer>(`${this.apiUrl}/${id}/ask/`,{ question });
+  }
+
+  getGraph(id: number): Observable<ChatGraph> {
+    return this.http.get<ChatGraph>(`${this.apiUrl}/${id}/graph/`);
   }
 }
