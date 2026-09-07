@@ -166,6 +166,51 @@ class Neo4jClient:
 
             return [record["chunk_id"] for record in result]
         
+    def get_website_graph(self, website_ids):
+        with self.driver.session() as session:
+            result = session.run("""
+                MATCH (website:Website)-[:HAS_CHUNK]->(chunk:Chunk)
+                WHERE website.id IN $website_ids
+                OPTIONAL MATCH (chunk)-[:MENTIONS]->(entity:Entity)
+                OPTIONAL MATCH (entity)-[r:RELATED_TO]-(related:Entity)
+                RETURN
+                    entity.name AS source,
+                    entity.type AS source_type,
+                    type(r) AS relationship,
+                    related.name AS target,
+                    related.type AS target_type
+            """, website_ids=website_ids)
+
+            nodes = {}
+            edges = []
+
+            for record in result:
+                if record["source"]:
+                    nodes[record["source"]] = {
+                        "id": record["source"],
+                        "label": record["source"],
+                        "type": record["source_type"]
+                    }
+
+                if record["target"]:
+                    nodes[record["target"]] = {
+                        "id": record["target"],
+                        "label": record["target"],
+                        "type": record["target_type"]
+                    }
+
+                if record["source"] and record["target"]:
+                    edges.append({
+                        "source": record["source"],
+                        "target": record["target"],
+                        "label": record["relationship"]
+                    })
+
+            return {
+                "nodes": list(nodes.values()),
+                "edges": edges
+            }
+        
     def get_chunks_by_query(self, query, website_ids):
         with self.driver.session() as session:
             result = session.run(

@@ -1,3 +1,4 @@
+from knowledge.graph import Neo4jClient
 from chat.chat_service import answer_question
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -71,3 +72,14 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
         return Response({
             "answer": answer
         })
+    
+    @action(detail=True, methods=["get"])
+    def graph(self, request, pk=None):
+        chat = self.get_object()
+        website_ids = list(chat.websites.values_list("id", flat=True))
+
+        neo4j_client = Neo4jClient()
+        graph = neo4j_client.get_website_graph(website_ids)
+        neo4j_client.close()
+
+        return Response(graph)
