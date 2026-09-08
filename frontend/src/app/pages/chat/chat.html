@@ -35,7 +35,14 @@
       <!-- Messages -->
       <div class="flex-grow-1 overflow-auto px-3 px-md-5 py-4">
         @if (showGraph()) {
-          <div #graphContainer id="graph-container"></div>
+          <div #graphContainer id="graph-container">
+            @if(isGraphLoading()){
+              <div class="graph-loading">
+                <div class="spinner-border text-primary" role="status"></div>
+                <span>در حال بارگذاری گراف...</span>
+              </div>
+            }
+          </div>
         } @else {
           @if (!messages().length && !isSending()) {
             <div class="d-flex justify-content-center align-items-center h-100">
