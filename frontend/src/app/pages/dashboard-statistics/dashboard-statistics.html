@@ -1,5 +1,4 @@
 <div dir="rtl">
-  <h2 class="mb-4">آمار داشبورد</h2>
 
   @if (loading()) {
     <div class="row g-4">
@@ -47,43 +46,53 @@
       <h2 class="mb-4">آمار داشبورد</h2>
 
       @if (dashboard()) {
-        <div class="row g-4">
-          <div class="col-md-6 col-xl-3">
+        <div class="row g-4 justify-content-center">
+          <div class="col-md-6 col-xl-2">
             <div class="stat-card">
               <i class="bi bi-globe2"></i>
               <div>
                 <span>وب‌سایت‌ها</span>
-                <strong>{{ dashboard()!.statistics.websites }}</strong>
+                <strong>{{ data.statistics.websites }}</strong>
               </div>
             </div>
           </div>
 
-          <div class="col-md-6 col-xl-3">
-            <div class="stat-card">
-              <i class="bi bi-arrow-repeat"></i>
-              <div>
-                <span>خزش‌ها</span>
-                <strong>{{ dashboard()!.statistics.crawls }}</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-xl-3">
+          <div class="col-md-6 col-xl-2">
             <div class="stat-card">
               <i class="bi bi-file-text"></i>
               <div>
                 <span>قطعه‌ها</span>
-                <strong>{{ dashboard()!.statistics.chunks }}</strong>
+                <strong>{{ data.statistics.chunks }}</strong>
               </div>
             </div>
           </div>
 
-          <div class="col-md-6 col-xl-3">
+          <div class="col-md-6 col-xl-2">
             <div class="stat-card">
               <i class="bi bi-diagram-3"></i>
               <div>
                 <span>موجودیت‌ها</span>
-                <strong>{{ dashboard()!.statistics.entities }}</strong>
+                <strong>{{ data.statistics.entities }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-2">
+            <div class="stat-card">
+              <i class="bi bi-file-earmark-text"></i>
+              <div>
+                <span>صفحات</span>
+                <strong>{{ totalPages() }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-2">
+            <div class="stat-card">
+              <i class="bi bi-check-circle"></i>
+              <div>
+                <span>موفقیت خزش</span>
+                <strong>{{ crawlSuccessRate() }}%</strong>
               </div>
             </div>
           </div>
