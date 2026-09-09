@@ -256,3 +256,13 @@
   height: 280px;
   position: relative;
 }
+
+.chart-container.small {
+  height: 240px;
+}
+
+.chart-container.pie {
+  height: 280px;
+  max-width: 360px;
+  margin: 0 auto;
+}
