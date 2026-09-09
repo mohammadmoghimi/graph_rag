@@ -3,6 +3,9 @@ from elasticsearch import Elasticsearch
 from knowledge.indexer import ES_URL, INDEX_NAME
 from knowledge.graph import Neo4jClient
 from websites.models import Website , Crawl
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Count
 
 class DashboardService:
 
@@ -183,3 +186,30 @@ class DashboardService:
 
         finally:
             graph.close()
+
+    def get_crawls_per_day(self, websites):
+        start_date = timezone.now().date() - timedelta(days=6)
+
+        crawls = (
+            Crawl.objects
+            .filter(
+                website__in=websites,
+                created_at__date__gte=start_date
+            )
+            .values("created_at__date")
+            .annotate(count=Count("id"))
+            .order_by("created_at__date")
+        )
+
+        counts = {
+            item["created_at__date"]: item["count"]
+            for item in crawls
+        }
+
+        return [
+            {
+                "date": start_date + timedelta(days=i),
+                "count": counts.get(start_date + timedelta(days=i), 0)
+            }
+            for i in range(7)
+        ]

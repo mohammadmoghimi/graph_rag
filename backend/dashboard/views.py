@@ -29,10 +29,13 @@ class DashboardView(APIView):
             "statistics": {
                 "websites": len(website_ids),
                 "crawls": crawls.count(),
+                "completed_crawls": crawls.filter(status="completed").count(),
+                "failed_crawls": crawls.filter(status="failed").count(),
                 "chunks": service.get_chunk_count(website_ids),
-                "entities": service.get_entity_count(website_ids),
+                "entities": service.get_entity_count(website_ids)
             },
             "recent_activity": service.get_recent_activity(websites),
             "system_status": service.get_system_status(),
-            "website_statistics": service.get_website_statistics(websites)
+            "website_statistics": service.get_website_statistics(websites),
+            "crawls_per_day": service.get_crawls_per_day(websites),
         })

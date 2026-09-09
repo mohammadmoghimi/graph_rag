@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 export interface DashboardStatistics {
   websites: number;
   crawls: number;
+  completed_crawls: number;
+  failed_crawls: number;
   chunks: number;
   entities: number;
 }
@@ -23,9 +25,10 @@ export interface SystemStatus {
 
 export interface DashboardData {
   statistics: DashboardStatistics;
+  crawls_per_day: CrawlDay[];
+  website_statistics: WebsiteStatistics[];
   recent_activity: Activity[];
   system_status: SystemStatus;
-  website_statistics: WebsiteStatistics[];
 }
 
 export interface WebsiteStatistics {
@@ -37,6 +40,11 @@ export interface WebsiteStatistics {
   entities: number;
   last_crawled_at: string | null;
   status: string;
+}
+
+export interface CrawlDay {
+  date: string;
+  count: number;
 }
 
 @Injectable({
