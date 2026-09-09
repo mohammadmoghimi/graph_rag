@@ -10,15 +10,19 @@ import { DatePipe } from '@angular/common';
 })
 export class DashboardStatistics {
   dashboard = signal<DashboardData | null>(null);
-
+  loading = signal(true);
   constructor(private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
     this.dashboardService.getDashboard().subscribe({
-      next: data => {this.dashboard.set(data) ,console.log(data , 'data') ;
+      next: data => {
+        this.dashboard.set(data) ,
+        console.log(data , 'data') ;
+        this.loading.set(false);
+    },
+      error: err => {console.error(err),
+        this.loading.set(false);
       },
-      error: err => console.error(err),
-      complete: () => console.log(this.dashboard)
     });
   }
 

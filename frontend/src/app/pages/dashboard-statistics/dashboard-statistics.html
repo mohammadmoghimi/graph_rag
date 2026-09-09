@@ -1,166 +1,198 @@
 <div dir="rtl">
-
   <h2 class="mb-4">آمار داشبورد</h2>
 
-  @if (dashboard()) {
-
+  @if (loading()) {
     <div class="row g-4">
+      @for (card of [1, 2, 3, 4, 5, 6]; track card) {
+        <div class="col-md-6 col-xl-4">
+          <div class="skeleton-card">
+            <div class="skeleton-icon"></div>
 
-      <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
-          <i class="bi bi-globe2"></i>
-          <div>
-            <span>وب‌سایت‌ها</span>
-            <strong>{{ dashboard()!.statistics.websites }}</strong>
+            <div class="skeleton-content">
+              <div class="skeleton-line small"></div>
+              <div class="skeleton-line large"></div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
-          <i class="bi bi-arrow-repeat"></i>
-          <div>
-            <span>خزش‌ها</span>
-            <strong>{{ dashboard()!.statistics.crawls }}</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
-          <i class="bi bi-file-text"></i>
-          <div>
-            <span>قطعه‌ها</span>
-            <strong>{{ dashboard()!.statistics.chunks }}</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-xl-3">
-        <div class="stat-card">
-          <i class="bi bi-diagram-3"></i>
-          <div>
-            <span>موجودیت‌ها</span>
-            <strong>{{ dashboard()!.statistics.entities }}</strong>
-          </div>
-        </div>
-      </div>
-
+      }
     </div>
 
     <div class="row g-4 mt-2">
-
       <div class="col-lg-7">
-        <div class="dashboard-card">
-          <h5>فعالیت‌های اخیر</h5>
-
-          @if (dashboard()!.recent_activity.length === 0) {
-            <p class="empty-state">فعالیتی وجود ندارد.</p>
-          } @else {
-            @for (activity of dashboard()!.recent_activity; track activity.created_at) {
-              <div class="activity-item">
-                <i
-                  class="bi"
-                  [class.bi-globe2]="activity.type === 'website'"
-                  [class.bi-arrow-repeat]="activity.type === 'crawl'"
-                ></i>
-
-                <div>
-                  <span>{{ activity.message }}</span>
-                  <small>
-                    {{ activity.created_at | date:'yyyy/MM/dd HH:mm' }}
-                  </small>
-                </div>
-              </div>
-            }
-          }
-        </div>
+        <div class="skeleton-panel"></div>
       </div>
 
       <div class="col-lg-5">
-        <div class="dashboard-card">
-          <h5>وضعیت سیستم</h5>
-
-          <div class="status-item">
-            <span>Django API</span>
-            <span
-              class="status"
-              [class.online]="dashboard()!.system_status.api === 'online'"
-            >
-              ● {{ dashboard()!.system_status.api }}
-            </span>
-          </div>
-
-          <div class="status-item">
-            <span>Elasticsearch</span>
-            <span
-              class="status"
-              [class.online]="dashboard()!.system_status.elasticsearch === 'online'"
-            >
-              ● {{ dashboard()!.system_status.elasticsearch }}
-            </span>
-          </div>
-
-          <div class="status-item">
-            <span>Neo4j</span>
-            <span
-              class="status"
-              [class.online]="dashboard()!.system_status.neo4j === 'online'"
-            >
-              ● {{ dashboard()!.system_status.neo4j }}
-            </span>
-          </div>
-
-        </div>
+        <div class="skeleton-panel"></div>
       </div>
-
     </div>
 
+    <div class="skeleton-table mt-4">
+      <div class="skeleton-line title"></div>
+
+      @for (row of [1, 2, 3, 4, 5]; track row) {
+        <div class="skeleton-table-row">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      }
+    </div>
   }
 
-</div>
+  @if (!loading() && dashboard(); as data) {
+    <div dir="rtl">
+      <h2 class="mb-4">آمار داشبورد</h2>
 
-<div class="dashboard-card mt-4">
-  <h5>آمار وب‌سایت‌ها</h5>
+      @if (dashboard()) {
+        <div class="row g-4">
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <i class="bi bi-globe2"></i>
+              <div>
+                <span>وب‌سایت‌ها</span>
+                <strong>{{ dashboard()!.statistics.websites }}</strong>
+              </div>
+            </div>
+          </div>
 
-  @if (dashboard()!.website_statistics.length === 0) {
-    <p class="empty-state">وب‌سایتی وجود ندارد.</p>
-  } @else {
-    <div class="table-responsive">
-      <table class="table align-middle">
-        <thead>
-          <tr>
-            <th>وب‌سایت</th>
-            <th>خزش‌ها</th>
-            <th>صفحات</th>
-            <th>قطعه‌ها</th>
-            <th>موجودیت‌ها</th>
-            <th>آخرین خزش</th>
-            <th>وضعیت</th>
-          </tr>
-        </thead>
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <i class="bi bi-arrow-repeat"></i>
+              <div>
+                <span>خزش‌ها</span>
+                <strong>{{ dashboard()!.statistics.crawls }}</strong>
+              </div>
+            </div>
+          </div>
 
-        <tbody>
-          @for (website of dashboard()!.website_statistics; track website.id) {
-            <tr>
-              <td>{{ website.name }}</td>
-              <td>{{ website.crawls }}</td>
-              <td>{{ website.pages }}</td>
-              <td>{{ website.chunks }}</td>
-              <td>{{ website.entities }}</td>
-              <td>
-                @if (website.last_crawled_at) {
-                  <!-- {{ website.last_crawled_at | date:'yyyy/MM/dd HH:mm' }} -->
-                  {{ timeAgo(website.last_crawled_at) }}
-                } @else {
-                  -
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <i class="bi bi-file-text"></i>
+              <div>
+                <span>قطعه‌ها</span>
+                <strong>{{ dashboard()!.statistics.chunks }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <i class="bi bi-diagram-3"></i>
+              <div>
+                <span>موجودیت‌ها</span>
+                <strong>{{ dashboard()!.statistics.entities }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4 mt-2">
+          <div class="col-lg-7">
+            <div class="dashboard-card">
+              <h5>فعالیت‌های اخیر</h5>
+
+              @if (dashboard()!.recent_activity.length === 0) {
+                <p class="empty-state">فعالیتی وجود ندارد.</p>
+              } @else {
+                @for (activity of dashboard()!.recent_activity; track activity.created_at) {
+                  <div class="activity-item">
+                    <i
+                      class="bi"
+                      [class.bi-globe2]="activity.type === 'website'"
+                      [class.bi-arrow-repeat]="activity.type === 'crawl'"
+                    ></i>
+
+                    <div>
+                      <span>{{ activity.message }}</span>
+                      <small>
+                        {{ activity.created_at | date: 'yyyy/MM/dd HH:mm' }}
+                      </small>
+                    </div>
+                  </div>
                 }
-              </td>
-              <td>{{ website.status }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
+              }
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="dashboard-card">
+              <h5>وضعیت سیستم</h5>
+
+              <div class="status-item">
+                <span>Django API</span>
+                <span class="status" [class.online]="dashboard()!.system_status.api === 'online'">
+                  ● {{ dashboard()!.system_status.api }}
+                </span>
+              </div>
+
+              <div class="status-item">
+                <span>Elasticsearch</span>
+                <span
+                  class="status"
+                  [class.online]="dashboard()!.system_status.elasticsearch === 'online'"
+                >
+                  ● {{ dashboard()!.system_status.elasticsearch }}
+                </span>
+              </div>
+
+              <div class="status-item">
+                <span>Neo4j</span>
+                <span class="status" [class.online]="dashboard()!.system_status.neo4j === 'online'">
+                  ● {{ dashboard()!.system_status.neo4j }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="dashboard-card mt-4">
+      <h5>آمار وب‌سایت‌ها</h5>
+
+      @if (dashboard()!.website_statistics.length === 0) {
+        <p class="empty-state">وب‌سایتی وجود ندارد.</p>
+      } @else {
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>وب‌سایت</th>
+                <th>خزش‌ها</th>
+                <th>صفحات</th>
+                <th>قطعه‌ها</th>
+                <th>موجودیت‌ها</th>
+                <th>آخرین خزش</th>
+                <th>وضعیت</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (website of dashboard()!.website_statistics; track website.id) {
+                <tr>
+                  <td>{{ website.name }}</td>
+                  <td>{{ website.crawls }}</td>
+                  <td>{{ website.pages }}</td>
+                  <td>{{ website.chunks }}</td>
+                  <td>{{ website.entities }}</td>
+                  <td>
+                    @if (website.last_crawled_at) {
+                      <!-- {{ website.last_crawled_at | date:'yyyy/MM/dd HH:mm' }} -->
+                      {{ timeAgo(website.last_crawled_at) }}
+                    } @else {
+                      -
+                    }
+                  </td>
+                  <td>{{ website.status }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
     </div>
   }
 </div>
