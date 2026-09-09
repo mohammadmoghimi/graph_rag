@@ -1,7 +1,9 @@
 import { Component, computed, signal } from '@angular/core';
 import { DashboardData, DashboardService } from '../../services/dashboard.service';
 import { DatePipe } from '@angular/common';
+import { Chart, registerables } from 'chart.js';
 
+Chart.register(...registerables);
 @Component({
   selector: 'app-dashboard-statistics',
   imports: [DatePipe],
@@ -11,6 +13,7 @@ import { DatePipe } from '@angular/common';
 export class DashboardStatistics {
   dashboard = signal<DashboardData | null>(null);
   loading = signal(true);
+  crawlChart = signal<Chart | null>(null);
   constructor(private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
@@ -18,6 +21,7 @@ export class DashboardStatistics {
       next: (data) => {
         (this.dashboard.set(data), console.log(data, 'data'));
         this.loading.set(false);
+        setTimeout(() => this.renderCrawlChart());
       },
       error: (err) => {
         (console.error(err), this.loading.set(false));
@@ -112,4 +116,59 @@ latestWebsite = computed(() => {
     )[0] ?? null;
 });
 
+renderCrawlChart(): void {
+  const data = this.dashboard();
+
+  if (!data) {
+    return;
+  }
+
+  const labels = data.crawls_per_day.map(item =>
+    new Date(item.date).toLocaleDateString('fa-IR', {
+      weekday: 'short'
+    })
+  );
+
+  const values = data.crawls_per_day.map(item => item.count);
+
+  const canvas = document.getElementById(
+    'crawlChart'
+  ) as HTMLCanvasElement;
+
+  this.crawlChart()?.destroy();
+
+  const chart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'خزش‌ها',
+          data: values,
+          tension: 0.4,
+          fill: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0
+          }
+        }
+      }
+    }
+  });
+
+  this.crawlChart.set(chart);
+}
 }

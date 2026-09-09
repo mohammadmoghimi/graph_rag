@@ -230,3 +230,29 @@
   color: #16a34a;
   font-size: 14px;
 }
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  h5 {
+    margin-bottom: 4px;
+  }
+
+  span {
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  i {
+    font-size: 24px;
+    color: #0d6efd;
+  }
+}
+
+.chart-container {
+  height: 280px;
+  position: relative;
+}
