@@ -1,5 +1,4 @@
 <div dir="rtl">
-
   @if (loading()) {
     <div class="row g-4">
       @for (card of [1, 2, 3, 4, 5, 6]; track card) {
@@ -91,12 +90,31 @@
             <div class="stat-card">
               <i class="bi bi-check-circle"></i>
               <div>
-                <span>موفقیت خزش</span>
+                <span>موفقیت </span>
                 <strong>{{ crawlSuccessRate() }}%</strong>
               </div>
             </div>
           </div>
         </div>
+
+        @if (latestWebsite(); as website) {
+          <div class="latest-website-card mt-4">
+            <div class="latest-icon">
+              <i class="bi bi-globe2"></i>
+            </div>
+
+            <div class="latest-content">
+              <span class="latest-label">آخرین وب‌سایت خزش‌شده</span>
+              <strong>{{ website.name }}</strong>
+              <small>{{ timeAgo(website.last_crawled_at) }}</small>
+            </div>
+
+            <div class="latest-status">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>تکمیل شده</span>
+            </div>
+          </div>
+        }
 
         <div class="row g-4 mt-2">
           <div class="col-lg-7">

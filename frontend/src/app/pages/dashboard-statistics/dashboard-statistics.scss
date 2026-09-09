@@ -176,3 +176,57 @@
   text-align: center;
   padding: 20px 0;
 }
+
+.latest-website-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 24px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.latest-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #eff6ff;
+
+  i {
+    font-size: 24px;
+    color: #0d6efd;
+  }
+}
+
+.latest-content {
+  flex: 1;
+
+  .latest-label {
+    display: block;
+    color: #94a3b8;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  strong {
+    display: block;
+    color: #1e293b;
+    font-size: 17px;
+  }
+
+  small {
+    color: #64748b;
+  }
+}
+
+.latest-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #16a34a;
+  font-size: 14px;
+}

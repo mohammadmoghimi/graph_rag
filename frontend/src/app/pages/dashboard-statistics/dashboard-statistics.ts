@@ -25,7 +25,11 @@ export class DashboardStatistics {
     });
   }
 
-  timeAgo(dateString: string): string {
+  timeAgo(dateString: string | null): string {
+    if (!dateString) {
+      return 'نامشخص';
+    }
+
     const now = Date.now();
     const past = new Date(dateString).getTime();
     const diff = now - past; // milliseconds
@@ -94,4 +98,18 @@ export class DashboardStatistics {
     }
     return Math.round((data.statistics.completed_crawls / data.statistics.crawls) * 100);
   });
+
+
+latestWebsite = computed(() => {
+  const websites = this.dashboard()?.website_statistics ?? [];
+
+  return websites
+    .filter(website => website.last_crawled_at)
+    .sort(
+      (a, b) =>
+        new Date(b.last_crawled_at!).getTime() -
+        new Date(a.last_crawled_at!).getTime()
+    )[0] ?? null;
+});
+
 }
