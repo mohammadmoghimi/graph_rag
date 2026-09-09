@@ -2,7 +2,7 @@
   @if (loading()) {
     <div class="row g-4">
       @for (card of [1, 2, 3, 4, 5, 6]; track card) {
-        <div class="col-md-6 col-xl-4">
+        <div class="col-sm-12 col-md-6 col-xl-4">
           <div class="skeleton-card">
             <div class="skeleton-icon"></div>
 
@@ -46,7 +46,7 @@
 
       @if (dashboard()) {
         <div class="row g-4 justify-content-center">
-          <div class="col-md-6 col-xl-2">
+          <div class="col-sm-12 col-md-6 col-xl-4">
             <div class="stat-card">
               <i class="bi bi-globe2"></i>
               <div>
@@ -56,7 +56,7 @@
             </div>
           </div>
 
-          <div class="col-md-6 col-xl-2">
+          <div class="col-sm-12 col-md-6 col-xl-4">
             <div class="stat-card">
               <i class="bi bi-file-text"></i>
               <div>
@@ -66,7 +66,7 @@
             </div>
           </div>
 
-          <div class="col-md-6 col-xl-2">
+          <div class="col-sm-12 col-md-6 col-xl-4">
             <div class="stat-card">
               <i class="bi bi-diagram-3"></i>
               <div>
@@ -76,7 +76,7 @@
             </div>
           </div>
 
-          <div class="col-md-6 col-xl-2">
+          <div class="col-sm-12 col-md-6 col-xl-4">
             <div class="stat-card">
               <i class="bi bi-file-earmark-text"></i>
               <div>
@@ -86,7 +86,7 @@
             </div>
           </div>
 
-          <div class="col-md-6 col-xl-2">
+          <div class="col-sm-12 col-md-6 col-xl-4">
             <div class="stat-card">
               <i class="bi bi-check-circle"></i>
               <div>
@@ -115,20 +115,35 @@
             </div>
           </div>
         }
+        <div class="row">
 
-        <div class="dashboard-card mt-4">
-          <div class="chart-header">
-            <div>
-              <h5>خزش‌ها در ۷ روز گذشته</h5>
-              <span>تعداد خزش‌های انجام‌شده در هر روز</span>
+          <div class="dashboard-card mt-4 col-lg-8">
+            <div class="chart-header">
+              <div>
+                <h5>خزش‌ها در ۷ روز گذشته</h5>
+                <span>تعداد خزش‌های انجام‌شده در هر روز</span>
+              </div>
+  
+              <i class="bi bi-graph-up"></i>
+            </div>
+  
+            <div class="chart-container">
+              <canvas id="crawlChart"></canvas>
+            </div>
+          </div>
+          <div class="dashboard-card col-lg-4 mt-4">
+            <div class="chart-header">
+              <div>
+                <h5>وضعیت خزش‌ها</h5>
+                <span>وضعیت کلی عملیات خزش</span>
+              </div>
+              <i class="bi bi-pie-chart"></i>
             </div>
 
-            <i class="bi bi-graph-up"></i>
-          </div>
-
-          <div class="chart-container">
-            <canvas id="crawlChart"></canvas>
-          </div>
+      <div class="chart-container pie">
+        <canvas #crawlStatusChart></canvas>
+      </div>
+    </div>
         </div>
 
         <div class="row g-4 mt-2">
@@ -223,20 +238,6 @@
             <canvas id="entitiesChart"></canvas>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div class="dashboard-card">
-      <div class="chart-header">
-        <div>
-          <h5>وضعیت خزش‌ها</h5>
-          <span>وضعیت کلی عملیات خزش</span>
-        </div>
-        <i class="bi bi-pie-chart"></i>
-      </div>
-
-      <div class="chart-container pie">
-        <canvas #crawlStatusChart></canvas>
       </div>
     </div>
 
