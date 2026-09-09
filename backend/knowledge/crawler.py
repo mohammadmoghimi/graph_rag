@@ -54,27 +54,11 @@ def extract_links(html, url, domain, visited):
 
     return links
 
-
-# def extract_content(html, url):
-#     soup = BeautifulSoup(html, "lxml")
-
-#     for tag in soup.select(
-#         "script, style, noscript, nav"
-#     ):
-#         tag.decompose()
-
-#     return Document(
-#         page_content=soup.get_text(" ", strip=True),
-#         metadata={"source_url": url}
-#     )
-
-
 def extract_content(html, url):
-    # Trafilatura automatically extracts the main content
     text = extract(html, include_comments=False, include_tables=False)
     
     if not text:
-        return None  # No main content found
+        return None
     
     return Document(
         page_content=text,
