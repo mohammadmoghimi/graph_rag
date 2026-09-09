@@ -33,5 +33,6 @@ class DashboardView(APIView):
                 "entities": service.get_entity_count(website_ids),
             },
             "recent_activity": service.get_recent_activity(websites),
-            "system_status": service.get_system_status()
+            "system_status": service.get_system_status(),
+            "website_statistics": service.get_website_statistics(websites)
         })

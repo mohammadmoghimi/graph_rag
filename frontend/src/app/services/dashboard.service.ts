@@ -25,6 +25,18 @@ export interface DashboardData {
   statistics: DashboardStatistics;
   recent_activity: Activity[];
   system_status: SystemStatus;
+  website_statistics: WebsiteStatistics[];
+}
+
+export interface WebsiteStatistics {
+  id: number;
+  name: string;
+  crawls: number;
+  pages: number;
+  chunks: number;
+  entities: number;
+  last_crawled_at: string | null;
+  status: string;
 }
 
 @Injectable({

@@ -109,3 +109,77 @@ class DashboardService:
             graph.close()
 
         return status
+    
+    def get_website_statistics(self, websites):
+        website_ids = list(websites.values_list("id", flat=True))
+
+        if not website_ids:
+            return []
+
+        graph = Neo4jClient()
+
+        try:
+            client = Elasticsearch(ES_URL)
+
+            response = client.search(
+                index=INDEX_NAME,
+                size=0,
+                query={
+                    "terms": {
+                        "metadata.website_id": website_ids
+                    }
+                },
+                aggs={
+                    "websites": {
+                        "terms": {
+                            "field": "metadata.website_id",
+                            "size": len(website_ids)
+                        }
+                    }
+                }
+            )
+
+            chunk_counts = {
+                bucket["key"]: bucket["doc_count"]
+                for bucket in response["aggregations"]["websites"]["buckets"]
+            }
+
+            client.close()
+
+            result = []
+
+            for website in websites:
+                crawl_data = Crawl.objects.filter(
+                    website=website,
+                    
+                ).order_by("completed_at")
+
+                last_crawl = crawl_data.first()
+
+                with graph.driver.session() as session:
+                    entity_result = session.run(
+                        """
+                        MATCH (website:Website)-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(entity:Entity)
+                        WHERE website.id = $website_id
+                        RETURN count(DISTINCT entity) AS count
+                        """,
+                        website_id=website.id
+                    )
+
+                    entity_count = entity_result.single()["count"]
+
+                result.append({
+                    "id": website.id,
+                    "name": website.name,
+                    "crawls": crawl_data.count(),
+                    "pages": sum(c.pages_processed for c in crawl_data),
+                    "chunks": chunk_counts.get(website.id, 0),
+                    "entities": entity_count,
+                    "last_crawled_at": last_crawl.completed_at if last_crawl else None,
+                    "status": website.status
+                })
+
+            return result
+
+        finally:
+            graph.close()

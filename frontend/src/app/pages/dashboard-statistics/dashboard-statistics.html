@@ -119,3 +119,48 @@
   }
 
 </div>
+
+<div class="dashboard-card mt-4">
+  <h5>آمار وب‌سایت‌ها</h5>
+
+  @if (dashboard()!.website_statistics.length === 0) {
+    <p class="empty-state">وب‌سایتی وجود ندارد.</p>
+  } @else {
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>وب‌سایت</th>
+            <th>خزش‌ها</th>
+            <th>صفحات</th>
+            <th>قطعه‌ها</th>
+            <th>موجودیت‌ها</th>
+            <th>آخرین خزش</th>
+            <th>وضعیت</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (website of dashboard()!.website_statistics; track website.id) {
+            <tr>
+              <td>{{ website.name }}</td>
+              <td>{{ website.crawls }}</td>
+              <td>{{ website.pages }}</td>
+              <td>{{ website.chunks }}</td>
+              <td>{{ website.entities }}</td>
+              <td>
+                @if (website.last_crawled_at) {
+                  <!-- {{ website.last_crawled_at | date:'yyyy/MM/dd HH:mm' }} -->
+                  {{ timeAgo(website.last_crawled_at) }}
+                } @else {
+                  -
+                }
+              </td>
+              <td>{{ website.status }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
