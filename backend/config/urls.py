@@ -12,4 +12,5 @@ urlpatterns = [
     path("api/chats/", include("chat.urls")),
     path("api/auth/signup/", SignupView.as_view()),
     path("api/users/", include("users.urls")),
+    path("api/dashboard/", include("dashboard.urls")),
 ]
