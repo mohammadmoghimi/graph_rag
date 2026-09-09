@@ -30,6 +30,8 @@ class DashboardView(APIView):
                 "websites": len(website_ids),
                 "crawls": crawls.count(),
                 "chunks": service.get_chunk_count(website_ids),
-                "entities": service.get_entity_count(website_ids)
-            }
+                "entities": service.get_entity_count(website_ids),
+            },
+            "recent_activity": service.get_recent_activity(websites),
+            "system_status": service.get_system_status()
         })
