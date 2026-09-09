@@ -3,6 +3,7 @@ import { Dashboard } from './dashboard';
 import { Websites } from '../websites/websites';
 import { Chat } from '../chat/chat';
 import { Users } from '../users/users';
+import { DashboardStatistics } from '../dashboard-statistics/dashboard-statistics';
 
 export const DASHBOARD_ROUTES: Routes = [
   {
@@ -21,6 +22,10 @@ export const DASHBOARD_ROUTES: Routes = [
       {
         path:'users',
         component:Users
+      },
+      {
+        path: 'statistics',
+        component: DashboardStatistics
       }
     ],
   },

@@ -1,0 +1,121 @@
+<div dir="rtl">
+
+  <h2 class="mb-4">آمار داشبورد</h2>
+
+  @if (dashboard()) {
+
+    <div class="row g-4">
+
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+          <i class="bi bi-globe2"></i>
+          <div>
+            <span>وب‌سایت‌ها</span>
+            <strong>{{ dashboard()!.statistics.websites }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+          <i class="bi bi-arrow-repeat"></i>
+          <div>
+            <span>خزش‌ها</span>
+            <strong>{{ dashboard()!.statistics.crawls }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+          <i class="bi bi-file-text"></i>
+          <div>
+            <span>قطعه‌ها</span>
+            <strong>{{ dashboard()!.statistics.chunks }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xl-3">
+        <div class="stat-card">
+          <i class="bi bi-diagram-3"></i>
+          <div>
+            <span>موجودیت‌ها</span>
+            <strong>{{ dashboard()!.statistics.entities }}</strong>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row g-4 mt-2">
+
+      <div class="col-lg-7">
+        <div class="dashboard-card">
+          <h5>فعالیت‌های اخیر</h5>
+
+          @if (dashboard()!.recent_activity.length === 0) {
+            <p class="empty-state">فعالیتی وجود ندارد.</p>
+          } @else {
+            @for (activity of dashboard()!.recent_activity; track activity.created_at) {
+              <div class="activity-item">
+                <i
+                  class="bi"
+                  [class.bi-globe2]="activity.type === 'website'"
+                  [class.bi-arrow-repeat]="activity.type === 'crawl'"
+                ></i>
+
+                <div>
+                  <span>{{ activity.message }}</span>
+                  <small>
+                    {{ activity.created_at | date:'yyyy/MM/dd HH:mm' }}
+                  </small>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="dashboard-card">
+          <h5>وضعیت سیستم</h5>
+
+          <div class="status-item">
+            <span>Django API</span>
+            <span
+              class="status"
+              [class.online]="dashboard()!.system_status.api === 'online'"
+            >
+              ● {{ dashboard()!.system_status.api }}
+            </span>
+          </div>
+
+          <div class="status-item">
+            <span>Elasticsearch</span>
+            <span
+              class="status"
+              [class.online]="dashboard()!.system_status.elasticsearch === 'online'"
+            >
+              ● {{ dashboard()!.system_status.elasticsearch }}
+            </span>
+          </div>
+
+          <div class="status-item">
+            <span>Neo4j</span>
+            <span
+              class="status"
+              [class.online]="dashboard()!.system_status.neo4j === 'online'"
+            >
+              ● {{ dashboard()!.system_status.neo4j }}
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  }
+
+</div>
