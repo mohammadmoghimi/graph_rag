@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     "websites",
     "chat",
     "knowledge",
-    "dashboard"
+    "dashboard",
+    "documents",
 ]
 
 MIDDLEWARE = [
