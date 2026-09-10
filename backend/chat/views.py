@@ -57,7 +57,7 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
             )
         )
 
-        answer = answer_question(
+        result = answer_question(
             question,
             website_ids,
             document_ids,
@@ -73,12 +73,10 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
         ChatMessage.objects.create(
             chat_session=chat,
             role="assistant",
-            content=answer
+            content=result["answer"]
         )
 
-        return Response({
-            "answer": answer
-        })
+        return Response(result)
     
     @action(detail=True, methods=["get"])
     def graph(self, request, pk=None):

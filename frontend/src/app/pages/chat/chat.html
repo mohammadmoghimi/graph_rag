@@ -36,7 +36,7 @@
       <div class="flex-grow-1 overflow-auto px-3 px-md-5 py-4">
         @if (showGraph()) {
           <div #graphContainer id="graph-container">
-            @if(isGraphLoading()){
+            @if (isGraphLoading()) {
               <div class="graph-loading">
                 <div class="spinner-border text-primary" role="status"></div>
                 <span>در حال بارگذاری گراف...</span>
@@ -95,8 +95,20 @@
                       [class.text-dark]="message.role === 'assistant'"
                       style="white-space: pre-wrap"
                     >
-                      {{ message.content }}
+                      {{ fixNumbers(message.content) }}
                     </div>
+                    @if (message.role === 'assistant' && message.mostRelevantChunk) {
+                      <div class="bg-white border rounded-4 p-3">
+                        <div class="small fw-semibold text-secondary mb-2">
+                          <i class="bi bi-file-text me-1"></i>
+                          مرتبط‌ترین بخش
+                        </div>
+
+                        <div class=" small text-secondary" style="white-space: pre-wrap">
+                          {{ message.mostRelevantChunk }}
+                        </div>
+                      </div>
+                    }
                   </div>
                 </div>
               }

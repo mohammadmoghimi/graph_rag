@@ -13,7 +13,7 @@ class GraphRAG:
         print("\nTOP CHUNK:")
         print(documents[0].page_content)
         print()
-
+        top_chunk = documents[0].page_content
         context = "\n\n".join(
             document.page_content
             for document in documents
@@ -37,7 +37,12 @@ If the context does not contain the answer, say:
 Answer:
 """
 
-        return generate(prompt)
+        answer = generate(prompt)
+
+        return {
+            "answer": answer,
+            "most_relevant_chunk": top_chunk
+        }
     
 
 

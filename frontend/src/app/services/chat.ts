@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+interface DisplayMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  mostRelevantChunk?: string;
+}
+
 export interface ChatWebsite {
   id: number;
   name: string;
@@ -12,6 +18,7 @@ export interface ChatMessage {
   id: number;
   role: 'user' | 'assistant';
   content: string;
+  mostRelevantChunk?: string;
   created_at: string;
 }
 
@@ -33,6 +40,8 @@ export interface ChatSession {
 
 export interface ChatAnswer {
   answer: string;
+  most_relevant_chunk: string;
+
 }
 
 export interface GraphNode {

@@ -448,3 +448,8 @@ form .btn-primary:disabled {
     transform: none;
   }
 }
+
+.message-content {
+  direction: rtl;
+  unicode-bidi: plaintext;
+}

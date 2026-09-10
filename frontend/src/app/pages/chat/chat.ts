@@ -110,12 +110,16 @@ export class Chat implements OnInit {
             id: 0,
             role: 'assistant',
             content: response.answer,
+            mostRelevantChunk: response.most_relevant_chunk,
             created_at: '',
           },
+
         ]);
 
         this.isSending.set(false);
         this.loadChats();
+        console.log(response ,'response');
+        
       },
       error: (error) => {
         this.messages.update((messages) => [
@@ -241,5 +245,9 @@ export class Chat implements OnInit {
       },
     });
     container.style.backgroundColor = '#1e293b';
+  }
+
+  fixNumbers(text: string): string {
+    return text.replace(/[۰-۹]+/g, match => match.split('').reverse().join(''));
   }
 }
