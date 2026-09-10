@@ -253,6 +253,30 @@ class Neo4jClient:
 
             return [r["chunk_id"] for r in result]
 
+    def create_document_chunk(self, document_id, chunk):
+        with self.driver.session() as session:
+            session.execute_write(
+                self._create_document_chunk,
+                document_id,
+                chunk
+            )
+
+    @staticmethod
+    def _create_document_chunk(tx, document_id, chunk):
+        tx.run(
+            """
+            MERGE (document:Document {id: $document_id})
+            MERGE (chunk:Chunk {id: $chunk_id})
+
+            SET chunk.document_id = $document_id,
+                chunk.source_file = $source_file
+
+            MERGE (document)-[:HAS_CHUNK]->(chunk)
+            """,
+            document_id=document_id,
+            chunk_id=chunk.metadata["chunk_id"],
+            source_file=chunk.metadata["source_file"]
+        )
 
     @staticmethod
     def _create_chunk(tx, website_id, chunk):
