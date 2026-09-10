@@ -61,9 +61,8 @@
           [disabled]="uploading() || !name().trim() || !selectedFile()"
           (click)="upload()"
         >
-          @if (uploading()) {
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            در حال ساخت پایگاه دانش...
+          @if (!uploading()) {
+            <app-modal title="در حال ساخت پایگاه دانش..."></app-modal>
           } @else {
             <i class="bi bi-stars me-2"></i>
             ساخت پایگاه دانش

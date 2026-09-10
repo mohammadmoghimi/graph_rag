@@ -1,0 +1,338 @@
+.knowledge-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #070b18;
+  color: white;
+}
+
+.knowledge-background {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.grid {
+  position: absolute;
+  inset: -50%;
+  background-image:
+    linear-gradient(rgba(100, 140, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100, 140, 255, 0.06) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform: perspective(500px) rotateX(60deg);
+  animation: gridMove 8s linear infinite;
+}
+
+.orbital {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 1px solid rgba(110, 150, 255, 0.15);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.orbital-1 {
+  width: 300px;
+  height: 300px;
+  animation: orbit 8s linear infinite;
+}
+
+.orbital-2 {
+  width: 430px;
+  height: 180px;
+  transform: translate(-50%, -50%) rotate(55deg);
+  animation: orbitReverse 10s linear infinite;
+}
+
+.orbital-3 {
+  width: 500px;
+  height: 220px;
+  transform: translate(-50%, -50%) rotate(-55deg);
+  animation: orbit 12s linear infinite;
+}
+
+.data-stream {
+  position: absolute;
+  width: 180px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #638cff, transparent);
+  filter: drop-shadow(0 0 8px #638cff);
+  opacity: 0;
+  animation: stream 2.5s linear infinite;
+}
+
+.stream-1 {
+  top: 35%;
+  left: -200px;
+  transform: rotate(15deg);
+}
+
+.stream-2 {
+  top: 45%;
+  left: -250px;
+  transform: rotate(5deg);
+  animation-delay: 0.7s;
+}
+
+.stream-3 {
+  top: 55%;
+  left: -200px;
+  transform: rotate(-10deg);
+  animation-delay: 1.2s;
+}
+
+.stream-4 {
+  top: 35%;
+  right: -200px;
+  transform: rotate(-15deg);
+  animation-delay: 0.4s;
+}
+
+.stream-5 {
+  top: 48%;
+  right: -250px;
+  transform: rotate(-5deg);
+  animation-delay: 1s;
+}
+
+.stream-6 {
+  top: 60%;
+  right: -200px;
+  transform: rotate(10deg);
+  animation-delay: 1.6s;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 2;
+  width: min(700px, 90%);
+  text-align: center;
+}
+
+.core-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 30px;
+}
+
+.core-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(80, 120, 255, 0.35);
+  filter: blur(30px);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.core {
+  position: absolute;
+  inset: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(150, 180, 255, 0.8);
+  border-radius: 50%;
+  background: radial-gradient(circle, #2949a0, #101a3c 70%);
+  box-shadow:
+    0 0 25px rgba(90, 130, 255, 0.7),
+    inset 0 0 20px rgba(120, 160, 255, 0.4);
+  animation: corePulse 2s ease-in-out infinite;
+}
+
+.core i {
+  font-size: 28px;
+}
+
+h3 {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin-bottom: 35px;
+  color: #9da9c7;
+}
+
+.pipeline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pipeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 75px;
+  color: #66708d;
+  font-size: 12px;
+  transition: 0.4s;
+}
+
+.pipeline-item.active {
+  color: #dce5ff;
+}
+
+.status-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #293452;
+  border-radius: 50%;
+  background: #10172b;
+  font-size: 17px;
+  transition: 0.4s;
+}
+
+.pipeline-item.active .status-icon {
+  border-color: #638cff;
+  color: #91b0ff;
+  box-shadow: 0 0 15px rgba(99, 140, 255, 0.35);
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+.delay-1 .status-icon {
+  animation-delay: 0.3s !important;
+}
+
+.delay-2 .status-icon {
+  animation-delay: 0.6s !important;
+}
+
+.delay-3 .status-icon {
+  animation-delay: 0.9s !important;
+}
+
+.delay-4 .status-icon {
+  animation-delay: 1.2s !important;
+}
+
+.delay-5 .status-icon {
+  animation-delay: 1.5s !important;
+}
+
+.pipeline-line {
+  width: 25px;
+  height: 1px;
+  background: linear-gradient(90deg, #293452, #638cff, #293452);
+  animation: linePulse 2s ease-in-out infinite;
+}
+
+.processing {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 30px;
+}
+
+.processing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #638cff;
+  animation: dot 1.2s ease-in-out infinite;
+}
+
+.processing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.processing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+@keyframes corePulse {
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes iconPulse {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes linePulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes dot {
+  50% {
+    transform: translateY(-5px);
+    opacity: 0.4;
+  }
+}
+
+@keyframes orbit {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes orbitReverse {
+  to {
+    transform: translate(-50%, -50%) rotate(-360deg);
+  }
+}
+
+@keyframes stream {
+  0% {
+    opacity: 0;
+    transform: translateX(0) rotate(15deg);
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(calc(50vw + 200px)) rotate(15deg);
+  }
+}
+
+@keyframes gridMove {
+  to {
+    transform: perspective(500px) rotateX(60deg) translateY(50px);
+  }
+}
+
+@media (max-width: 768px) {
+  .pipeline {
+    gap: 5px;
+  }
+
+  .pipeline-line {
+    display: none;
+  }
+
+  .pipeline-item {
+    min-width: 90px;
+    margin-bottom: 10px;
+  }
+}

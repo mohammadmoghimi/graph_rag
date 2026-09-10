@@ -4,10 +4,11 @@ import { DocumentItem, DocumentsService } from '../../services/documents.service
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Modal } from '../modal/modal';
 
 @Component({
   selector: 'app-documents',
-  imports: [DatePipe, FormsModule],
+  imports: [DatePipe, FormsModule , Modal],
   templateUrl: './documents.html',
   styleUrl: './documents.scss',
 })
