@@ -144,6 +144,8 @@ export class Chat implements OnInit {
       next: graph => {
         this.graph.set(graph);
         this.isGraphLoading.set(false);
+        console.log(this.graph());
+
       },
       error: () => {
         this.isGraphLoading.set(false);

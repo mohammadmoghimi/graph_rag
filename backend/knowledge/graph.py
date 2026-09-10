@@ -330,16 +330,32 @@ class Neo4jClient:
                 """
                 MATCH (chunk:Chunk)-[:MENTIONS]->(entity:Entity)
 
-                OPTIONAL MATCH (website:Website)-[:HAS_CHUNK]->(chunk)
-                OPTIONAL MATCH (document:Document)-[:HAS_CHUNK]->(chunk)
-
-                WHERE
-                    website.id IN $website_ids
-                    OR document.id IN $document_ids
+                WHERE EXISTS {
+                    MATCH (website:Website)-[:HAS_CHUNK]->(chunk)
+                    WHERE website.id IN $website_ids
+                }
+                OR EXISTS {
+                    MATCH (document:Document)-[:HAS_CHUNK]->(chunk)
+                    WHERE document.id IN $document_ids
+                }
 
                 OPTIONAL MATCH (entity)-[r:RELATED_TO]-(related:Entity)
 
-                RETURN
+                WHERE related IS NULL
+                OR EXISTS {
+                    MATCH (related_chunk:Chunk)-[:MENTIONS]->(related)
+                    WHERE
+                        EXISTS {
+                            MATCH (website:Website)-[:HAS_CHUNK]->(related_chunk)
+                            WHERE website.id IN $website_ids
+                        }
+                        OR EXISTS {
+                            MATCH (document:Document)-[:HAS_CHUNK]->(related_chunk)
+                            WHERE document.id IN $document_ids
+                        }
+                }
+
+                RETURN DISTINCT
                     entity.name AS source,
                     entity.type AS source_type,
                     type(r) AS relationship,
@@ -351,7 +367,7 @@ class Neo4jClient:
             )
 
             nodes = {}
-            edges = []
+            edges = set()
 
             for record in result:
                 if record["source"]:
@@ -369,15 +385,22 @@ class Neo4jClient:
                     }
 
                 if record["source"] and record["target"]:
-                    edges.append({
-                        "source": record["source"],
-                        "target": record["target"],
-                        "label": record["relationship"]
-                    })
+                    edges.add((
+                        record["source"],
+                        record["target"],
+                        record["relationship"]
+                    ))
 
             return {
                 "nodes": list(nodes.values()),
-                "edges": edges
+                "edges": [
+                    {
+                        "source": source,
+                        "target": target,
+                        "label": relationship
+                    }
+                    for source, target, relationship in edges
+                ]
             }
 
     @staticmethod
