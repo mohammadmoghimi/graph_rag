@@ -56,7 +56,10 @@ export class Dashboard {
 
   loadChats() {
     this.chatService.getChats().subscribe({
-      next: (chats) => this.chats.set(chats),
+      next: (chats) =>{ this.chats.set(chats)
+        console.log(this.chats() , 'chatlist');
+        
+      },
     });
   }
 
