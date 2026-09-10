@@ -12,7 +12,7 @@ export interface DocumentItem {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DocumentsService {
   private readonly url = 'http://127.0.0.1:8000/api/documents';
@@ -23,24 +23,21 @@ export class DocumentsService {
     return this.http.get<DocumentItem[]>(this.url);
   }
 
-  uploadDocument(
-    name: string,
-    description: string,
-    file: File
-  ): Observable<DocumentItem> {
+  uploadDocument(name: string, description: string, file: File): Observable<DocumentItem> {
     const formData = new FormData();
 
     formData.append('name', name);
     formData.append('description', description);
     formData.append('file', file);
 
-    return this.http.post<DocumentItem>(
-      `${this.url}/upload/`,
-      formData
-    );
+    return this.http.post<DocumentItem>(`${this.url}/upload/`, formData);
   }
 
   deleteDocument(id: number): Observable<void> {
     return this.http.delete<void>(`${this.url}/${id}/`);
+  }
+
+  updateDocument(id: number, name: string, description: string): Observable<DocumentItem> {
+    return this.http.patch<DocumentItem>(`${this.url}/${id}/`, { name, description });
   }
 }

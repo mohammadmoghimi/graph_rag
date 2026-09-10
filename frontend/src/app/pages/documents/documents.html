@@ -1,5 +1,4 @@
 <div class="container-fluid px-0" dir="rtl">
-
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h2 class="fw-semibold mb-1">اسناد</h2>
@@ -9,7 +8,6 @@
 
   <div class="card border-0 shadow-sm rounded-4 mb-4">
     <div class="card-body p-4">
-
       <div class="d-flex align-items-center gap-3 mb-4">
         <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3">
           <i class="bi bi-file-earmark-text fs-4"></i>
@@ -17,14 +15,11 @@
 
         <div>
           <h5 class="fw-semibold mb-1">افزودن سند</h5>
-          <small class="text-secondary">
-            سند را وارد کنید تا به پایگاه دانش اضافه شود.
-          </small>
+          <small class="text-secondary"> سند را وارد کنید تا به پایگاه دانش اضافه شود. </small>
         </div>
       </div>
 
       <div class="row g-3">
-
         <div class="col-12 col-lg-6">
           <label class="form-label fw-medium">نام سند</label>
 
@@ -33,7 +28,7 @@
             [value]="name()"
             (input)="name.set($any($event.target).value)"
             placeholder="مثلاً مقاله هوش مصنوعی"
-          >
+          />
         </div>
 
         <div class="col-12 col-lg-6">
@@ -44,7 +39,7 @@
             class="form-control form-control-lg"
             accept=".pdf,.txt"
             (change)="onFileSelected($event)"
-          >
+          />
         </div>
 
         <div class="col-12">
@@ -58,7 +53,6 @@
             placeholder="توضیح کوتاهی درباره این سند..."
           ></textarea>
         </div>
-
       </div>
 
       <div class="d-flex justify-content-end mt-4">
@@ -76,19 +70,14 @@
           }
         </button>
       </div>
-
     </div>
   </div>
 
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <h5 class="fw-semibold mb-0">
-      برای شروع چت، اسناد مورد نظر خود را انتخاب کنید
-    </h5>
+    <h5 class="fw-semibold mb-0">برای شروع چت، اسناد مورد نظر خود را انتخاب کنید</h5>
 
     <div class="d-flex gap-2">
-      <span class="badge text-bg-light border px-3 py-2">
-        {{ documents().length }} سند
-      </span>
+      <span class="badge text-bg-light border px-3 py-2"> {{ documents().length }} سند </span>
 
       <span class="badge text-bg-light border px-3 py-2">
         {{ selectedDocumentIds().size }} انتخاب شده
@@ -97,54 +86,38 @@
   </div>
 
   @if (loading()) {
-
     <div class="text-center py-5">
       <div class="spinner-border text-primary"></div>
-      <p class="text-secondary mt-3 mb-0">
-        در حال دریافت اسناد...
-      </p>
+      <p class="text-secondary mt-3 mb-0">در حال دریافت اسناد...</p>
     </div>
-
   } @else if (documents().length === 0) {
-
     <div class="card border-0 shadow-sm rounded-4">
       <div class="card-body text-center py-5">
         <i class="bi bi-file-earmark-text display-5 text-secondary"></i>
 
         <h5 class="mt-3">هنوز سندی اضافه نشده است</h5>
 
-        <p class="text-secondary mb-0">
-          اولین سند خود را اضافه کنید.
-        </p>
+        <p class="text-secondary mb-0">اولین سند خود را اضافه کنید.</p>
       </div>
     </div>
-
   } @else {
-
     <div class="row g-3">
-
       @for (document of documents(); track document.id) {
-
         <div class="col-12 col-md-6 col-xl-4">
-
           <div
             class="card border-0 shadow-sm h-100"
             [class.border-primary]="isSelected(document.id)"
             [class.border-danger]="document.status === 'failed'"
             [class.border-2]="isSelected(document.id) || document.status === 'failed'"
           >
-
             <div
               class="card-body p-4 website-card position-relative"
               [class.selected]="isSelected(document.id)"
               [class.border-danger]="document.status === 'failed'"
               (click)="document.status !== 'failed' && toggleDocument(document.id)"
             >
-
               <div class="d-flex justify-content-between align-items-start mb-3">
-
                 <div class="d-flex align-items-center gap-3">
-
                   <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2">
                     <i class="bi bi-file-earmark-text fs-5"></i>
                   </div>
@@ -155,28 +128,32 @@
                     </h6>
 
                     <small class="text-secondary">
-                      {{ document.name.endsWith('.pdf') ? 'PDF' : 'TXT' }}
+                      PDF
                     </small>
                   </div>
-
                 </div>
 
-                <div
-                  class="d-flex flex-column gap-2"
-                  (click)="$event.stopPropagation()"
-                >
+                <div class="d-flex flex-column gap-2" (click)="$event.stopPropagation()">
+                  @if (document.status === 'completed') {
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-light rounded-circle"
+                      (click)="editDocument(document)"
+                      title="ویرایش"
+                    >
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                  }
 
                   <button
                     type="button"
                     class="btn btn-sm btn-light text-danger rounded-circle"
-                    (click)="deleteDocument(document)"
+                    (click)="deleteDocument(document.id)"
                     title="حذف"
                   >
                     <i class="bi bi-trash"></i>
                   </button>
-
                 </div>
-
               </div>
 
               <p class="text-secondary small mb-0">
@@ -184,51 +161,69 @@
               </p>
 
               @if (document.status === 'failed') {
-
                 <div class="mt-3">
                   <span class="badge text-bg-danger">
                     <i class="bi bi-exclamation-circle me-1"></i>
                     پردازش ناموفق
                   </span>
                 </div>
-
               }
 
               @if (isSelected(document.id)) {
-
                 <div class="mt-3 text-success small fw-semibold">
                   <i class="bi bi-check-circle-fill me-1"></i>
                   انتخاب شده برای گفتگو
                 </div>
-
               }
-
             </div>
-
           </div>
-
         </div>
-
       }
-
     </div>
-
   }
 
   @if (selectedDocumentIds().size > 0) {
-
     <div class="position-fixed bottom-0 start-50 translate-middle-x mb-4 z-3">
-
-      <button
-        class="btn btn-primary btn-lg rounded-pill shadow px-4"
-        (click)="startChat()"
-      >
+      <button class="btn btn-primary btn-lg rounded-pill shadow px-4" (click)="startChat()">
         <i class="bi bi-chat-dots me-2"></i>
         گفتگو با {{ selectedDocumentIds().size }} سند
       </button>
-
     </div>
-
   }
-
 </div>
+
+@if (editingDocument()) {
+  <div class="modal d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header">
+          <h5 class="modal-title">ویرایش سند</h5>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">نام سند</label>
+
+            <input class="form-control" [(ngModel)]="editName" />
+          </div>
+
+          <div>
+            <label class="form-label">توضیحات</label>
+
+            <textarea class="form-control" rows="4" [(ngModel)]="editDescription"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-light" (click)="cancelEdit()">انصراف</button>
+
+          <button class="btn btn-primary" [disabled]="!editName.trim()" (click)="saveDocument()">
+            ذخیره تغییرات
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop fade show"></div>
+}
