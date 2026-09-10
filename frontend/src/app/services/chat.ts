@@ -15,10 +15,17 @@ export interface ChatMessage {
   created_at: string;
 }
 
+export interface ChatDocument {
+  id: number;
+  name: string;
+  description: string;
+}
+
 export interface ChatSession {
   id: number;
   title: string;
   websites: ChatWebsite[];
+  documents: ChatDocument[];
   messages: ChatMessage[];
   created_at: string;
   updated_at: string;
@@ -57,8 +64,16 @@ export class ChatService {
     return this.http.get<ChatSession[]>(`${this.apiUrl}/`);
   }
 
-  createChat(title: string,websiteIds: number[]): Observable<ChatSession> {    
-    return this.http.post<ChatSession>(`${this.apiUrl}/`, {title,website_ids: websiteIds});
+  createChat(
+    title: string,
+    websiteIds: number[] = [],
+    documentIds: number[] = []
+  ): Observable<ChatSession> {
+    return this.http.post<ChatSession>(`${this.apiUrl}/`, {
+      title,
+      website_ids: websiteIds,
+      document_ids: documentIds
+    });
   }
 
   getChat(id: number): Observable<ChatSession> {

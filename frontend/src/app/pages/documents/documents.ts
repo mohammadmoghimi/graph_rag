@@ -1,6 +1,8 @@
+import { ChatService } from './../../services/chat';
 import { Component, signal } from '@angular/core';
 import { DocumentItem, DocumentsService } from '../../services/documents.service';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-documents',
@@ -16,8 +18,12 @@ export class Documents {
   selectedFile = signal<File | null>(null);
   name = signal('');
   description = signal('');
+  selectedDocumentIds = signal<Set<number>>(new Set());
 
-  constructor(private documentsService: DocumentsService) {}
+  constructor(private documentsService: DocumentsService,
+              private chatService: ChatService,
+              private router : Router
+  ) {}
 
   ngOnInit(): void {
     this.loadDocuments();
@@ -88,4 +94,44 @@ export class Documents {
     this.name.set('');
     this.description.set('');
   }
+
+  toggleDocument(id: number) {
+  this.selectedDocumentIds.update(set => {
+    const newSet = new Set(set);
+    newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+    return newSet;
+  });
+  }
+
+  isSelected(id: number) {
+    return this.selectedDocumentIds().has(id);
+  }
+
+  startChat() {
+  const documentIds = [...this.selectedDocumentIds()];
+
+  if (!documentIds.length) return;
+
+  const selectedDocuments = this.documents().filter(document =>
+    documentIds.includes(document.id)
+  );
+
+  const title = selectedDocuments.length <= 2
+    ? selectedDocuments.map(document => document.name).join(' و ')
+    : `${selectedDocuments[0].name}، ${selectedDocuments[1].name} و ${selectedDocuments.length - 2} سند دیگر`;
+
+  this.chatService.createChat(
+    title,
+    [],
+    documentIds
+  ).subscribe({
+    next: chat => {
+      this.selectedDocumentIds.set(new Set());
+      this.router.navigate(['/chats', chat.id]);
+    },
+    error: error => {console.log(error , 'error');
+    
+    }
+  });
+}
 }

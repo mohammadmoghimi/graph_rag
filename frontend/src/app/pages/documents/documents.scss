@@ -1,0 +1,37 @@
+.website-page {
+  max-width: 1200px;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .1);
+}
+
+.card {
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.website-card{
+  cursor: pointer;
+  transition: transform 0.25s, 
+  box-shadow 0.25s ease;
+  border-radius: inherit;
+}
+
+.website-card:hover {
+  transform: translateY(-4px); 
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); 
+  background-color: rgba(0, 0, 0, 0.01);
+}
+
+.website-card:hover {
+  transform: translateY(-2px);
+}
+
+.website-card.selected {
+  background-color: rgba(25, 135, 84, .1);
+  box-shadow: 0 0 0 2px rgba(25, 135, 84, .25);
+}
+
+.website-card.selected:hover {
+  background-color: rgba(25, 135, 84, .15);
+}

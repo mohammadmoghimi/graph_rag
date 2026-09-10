@@ -1,126 +1,234 @@
-<div class="container-fluid py-4" dir="rtl">
+<div class="container-fluid px-0" dir="rtl">
 
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h3 class="fw-bold mb-1">اسناد</h3>
-      <p class="text-muted mb-0">
-        اسناد خود را آپلود و برای جستجوی هوشمند آماده کنید.
+      <h2 class="fw-semibold mb-1">اسناد</h2>
+      <p class="text-secondary mb-0">اسناد پایگاه دانش خود را مدیریت کنید.</p>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3">
+          <i class="bi bi-file-earmark-text fs-4"></i>
+        </div>
+
+        <div>
+          <h5 class="fw-semibold mb-1">افزودن سند</h5>
+          <small class="text-secondary">
+            سند را وارد کنید تا به پایگاه دانش اضافه شود.
+          </small>
+        </div>
+      </div>
+
+      <div class="row g-3">
+
+        <div class="col-12 col-lg-6">
+          <label class="form-label fw-medium">نام سند</label>
+
+          <input
+            class="form-control form-control-lg"
+            [value]="name()"
+            (input)="name.set($any($event.target).value)"
+            placeholder="مثلاً مقاله هوش مصنوعی"
+          >
+        </div>
+
+        <div class="col-12 col-lg-6">
+          <label class="form-label fw-medium">فایل</label>
+
+          <input
+            type="file"
+            class="form-control form-control-lg"
+            accept=".pdf,.txt"
+            (change)="onFileSelected($event)"
+          >
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-medium">توضیحات</label>
+
+          <textarea
+            class="form-control"
+            rows="3"
+            [value]="description()"
+            (input)="description.set($any($event.target).value)"
+            placeholder="توضیح کوتاهی درباره این سند..."
+          ></textarea>
+        </div>
+
+      </div>
+
+      <div class="d-flex justify-content-end mt-4">
+        <button
+          class="btn btn-primary px-4 py-2"
+          [disabled]="uploading() || !name().trim() || !selectedFile()"
+          (click)="upload()"
+        >
+          @if (uploading()) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            در حال ساخت پایگاه دانش...
+          } @else {
+            <i class="bi bi-stars me-2"></i>
+            ساخت پایگاه دانش
+          }
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="fw-semibold mb-0">
+      برای شروع چت، اسناد مورد نظر خود را انتخاب کنید
+    </h5>
+
+    <div class="d-flex gap-2">
+      <span class="badge text-bg-light border px-3 py-2">
+        {{ documents().length }} سند
+      </span>
+
+      <span class="badge text-bg-light border px-3 py-2">
+        {{ selectedDocumentIds().size }} انتخاب شده
+      </span>
+    </div>
+  </div>
+
+  @if (loading()) {
+
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="text-secondary mt-3 mb-0">
+        در حال دریافت اسناد...
       </p>
     </div>
-  </div>
 
-  <div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-      <h5 class="fw-bold mb-3">آپلود سند</h5>
+  } @else if (documents().length === 0) {
 
-      <div class="mb-3">
-        <label class="form-label">فایل</label>
-        <input
-          type="file"
-          class="form-control"
-          accept=".pdf,.txt"
-          (change)="onFileSelected($event)"
-        >
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-file-earmark-text display-5 text-secondary"></i>
+
+        <h5 class="mt-3">هنوز سندی اضافه نشده است</h5>
+
+        <p class="text-secondary mb-0">
+          اولین سند خود را اضافه کنید.
+        </p>
       </div>
-
-      <div class="mb-3">
-        <label class="form-label">نام</label>
-        <input
-          type="text"
-          class="form-control"
-          [value]="name()"
-          (input)="name.set($any($event.target).value)"
-        >
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">توضیحات</label>
-        <textarea
-          class="form-control"
-          rows="3"
-          [value]="description()"
-          (input)="description.set($any($event.target).value)"
-        ></textarea>
-      </div>
-
-      <button
-        class="btn btn-primary"
-        [disabled]="uploading() || !selectedFile() || !name()"
-        (click)="upload()"
-      >
-        @if (uploading()) {
-          <span class="spinner-border spinner-border-sm me-2"></span>
-          در حال پردازش...
-        } @else {
-          آپلود سند
-        }
-      </button>
     </div>
-  </div>
 
-  <div class="card border-0 shadow-sm">
-    <div class="card-body">
+  } @else {
 
-      <h5 class="fw-bold mb-3">اسناد شما</h5>
+    <div class="row g-3">
 
-      @if (loading()) {
-        <div class="text-center py-5">
-          <div class="spinner-border"></div>
-        </div>
-      } @else if (documents().length === 0) {
-        <div class="text-center text-muted py-5">
-          هنوز سندی اضافه نشده است.
-        </div>
-      } @else {
-        <div class="table-responsive">
-          <table class="table align-middle">
-            <thead>
-              <tr>
-                <th>نام</th>
-                <th>وضعیت</th>
-                <th>تاریخ</th>
-                <th></th>
-              </tr>
-            </thead>
+      @for (document of documents(); track document.id) {
 
-            <tbody>
-              @for (document of documents(); track document.id) {
-                <tr>
-                  <td class="fw-semibold">
-                    {{ document.name }}
-                  </td>
+        <div class="col-12 col-md-6 col-xl-4">
 
-                  <td>
-                    <span
-                      class="badge"
-                      [class.bg-success]="document.status === 'completed'"
-                      [class.bg-danger]="document.status === 'failed'"
-                      [class.bg-warning]="document.status === 'processing'"
-                    >
-                      {{ document.status }}
-                    </span>
-                  </td>
+          <div
+            class="card border-0 shadow-sm h-100"
+            [class.border-primary]="isSelected(document.id)"
+            [class.border-danger]="document.status === 'failed'"
+            [class.border-2]="isSelected(document.id) || document.status === 'failed'"
+          >
 
-                  <td>
-                    {{ document.created_at | date:'yyyy/MM/dd' }}
-                  </td>
+            <div
+              class="card-body p-4 website-card position-relative"
+              [class.selected]="isSelected(document.id)"
+              [class.border-danger]="document.status === 'failed'"
+              (click)="document.status !== 'failed' && toggleDocument(document.id)"
+            >
 
-                  <td>
-                    <button
-                      class="btn btn-sm btn-outline-danger"
-                      (click)="deleteDocument(document)"
-                    >
-                      حذف
-                    </button>
-                  </td>
-                </tr>
+              <div class="d-flex justify-content-between align-items-start mb-3">
+
+                <div class="d-flex align-items-center gap-3">
+
+                  <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2">
+                    <i class="bi bi-file-earmark-text fs-5"></i>
+                  </div>
+
+                  <div>
+                    <h6 class="fw-semibold mb-1">
+                      {{ document.name }}
+                    </h6>
+
+                    <small class="text-secondary">
+                      {{ document.name.endsWith('.pdf') ? 'PDF' : 'TXT' }}
+                    </small>
+                  </div>
+
+                </div>
+
+                <div
+                  class="d-flex flex-column gap-2"
+                  (click)="$event.stopPropagation()"
+                >
+
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light text-danger rounded-circle"
+                    (click)="deleteDocument(document)"
+                    title="حذف"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+
+                </div>
+
+              </div>
+
+              <p class="text-secondary small mb-0">
+                {{ document.description || 'بدون توضیحات' }}
+              </p>
+
+              @if (document.status === 'failed') {
+
+                <div class="mt-3">
+                  <span class="badge text-bg-danger">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    پردازش ناموفق
+                  </span>
+                </div>
+
               }
-            </tbody>
-          </table>
+
+              @if (isSelected(document.id)) {
+
+                <div class="mt-3 text-success small fw-semibold">
+                  <i class="bi bi-check-circle-fill me-1"></i>
+                  انتخاب شده برای گفتگو
+                </div>
+
+              }
+
+            </div>
+
+          </div>
+
         </div>
+
       }
 
     </div>
-  </div>
+
+  }
+
+  @if (selectedDocumentIds().size > 0) {
+
+    <div class="position-fixed bottom-0 start-50 translate-middle-x mb-4 z-3">
+
+      <button
+        class="btn btn-primary btn-lg rounded-pill shadow px-4"
+        (click)="startChat()"
+      >
+        <i class="bi bi-chat-dots me-2"></i>
+        گفتگو با {{ selectedDocumentIds().size }} سند
+      </button>
+
+    </div>
+
+  }
 
 </div>

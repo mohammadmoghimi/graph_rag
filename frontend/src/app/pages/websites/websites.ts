@@ -147,7 +147,7 @@ export class Websites implements OnInit {
   }
 
   truncateUrl(url: string): string {
-    const maxLength = 30;
+    const maxLength = 20;
     if (!url) return '';
     return url.length > maxLength ? url.substring(0, maxLength) + '...' : url;
   }
