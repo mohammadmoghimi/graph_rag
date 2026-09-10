@@ -1,10 +1,17 @@
 import { Component, signal } from '@angular/core';
 import { Auth } from '../../services/auth';
-import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
 import { ChatService, ChatSession } from '../../services/chat';
 import { filter } from 'rxjs';
 // import { AdminUser } from '../../services/user';
-import {User} from '../../services/auth'
+import { User } from '../../services/auth';
 @Component({
   selector: 'app-dashboard',
   imports: [RouterLink, RouterLinkActive, RouterOutlet],
@@ -17,7 +24,7 @@ export class Dashboard {
   chats = signal<ChatSession[]>([]);
   activeChatId = signal<number | null>(null);
   currentUser = signal<User | null>(null);
-  
+
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
@@ -26,32 +33,30 @@ export class Dashboard {
     private authService: Auth,
     private router: Router,
     private chatService: ChatService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {}
-  
+
   ngOnInit() {
     this.getCurrentUser();
     this.loadChats();
 
     this.setActiveChatFromRoute();
 
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.setActiveChatFromRoute();
-      });
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
+      this.setActiveChatFromRoute();
+    });
   }
 
   getCurrentUser() {
     this.authService.getCurrentUser().subscribe({
-      next: user => this.currentUser.set(user) ,
-      complete: () => console.log('Current user loaded' , this.currentUser())
+      next: (user) => this.currentUser.set(user),
+      complete: () => console.log('Current user loaded', this.currentUser()),
     });
   }
 
   loadChats() {
     this.chatService.getChats().subscribe({
-      next: chats => this.chats.set(chats)
+      next: (chats) => this.chats.set(chats),
     });
   }
 
@@ -73,9 +78,14 @@ export class Dashboard {
     this.isChatsExpanded = !this.isChatsExpanded;
   }
 
-
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  truncateChatName(url: string): string {
+    const maxLength = 27;
+    if (!url) return '';
+    return url.length > maxLength ? url.substring(0, maxLength) + '...' : url;
   }
 }
