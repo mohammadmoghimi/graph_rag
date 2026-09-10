@@ -211,19 +211,77 @@ class Neo4jClient:
                 "edges": edges
             }
         
-    def get_chunks_by_query(self, query, website_ids):
+    # def get_chunks_by_query(self, query, website_ids):
+    #     with self.driver.session() as session:
+    #         result = session.run(
+    #             """
+    #             MATCH (website:Website)-[:HAS_CHUNK]->(chunk:Chunk)
+    #             MATCH (chunk)-[:MENTIONS]->(entity:Entity)
+    #             WHERE website.id IN $website_ids
+    #             RETURN DISTINCT entity.name AS name
+    #             """,
+    #             website_ids=website_ids
+    #         )
+
+    #         entity_names = [r["name"] for r in result]
+
+    #     matches = process.extract(
+    #         query,
+    #         entity_names,
+    #         scorer=fuzz.partial_ratio,
+    #         limit=5,
+    #         score_cutoff=60
+    #     )
+
+    #     matched_names = [match[0] for match in matches]
+
+    #     if not matched_names:
+    #         return []
+
+    #     with self.driver.session() as session:
+    #         result = session.run(
+    #             """
+    #             MATCH (website:Website)-[:HAS_CHUNK]->(chunk:Chunk)
+    #             MATCH (chunk)-[:MENTIONS]->(entity:Entity)
+    #             WHERE website.id IN $website_ids
+    #             AND entity.name IN $matched_names
+    #             RETURN DISTINCT chunk.id AS chunk_id
+    #             """,
+    #             website_ids=website_ids,
+    #             matched_names=matched_names
+    #         )
+
+    #         return [r["chunk_id"] for r in result]
+
+    def create_document_chunk(self, document_id, chunk):
+        with self.driver.session() as session:
+            session.execute_write(
+                self._create_document_chunk,
+                document_id,
+                chunk
+            )
+
+    def get_chunks_by_query(self, query, website_ids, document_ids):
         with self.driver.session() as session:
             result = session.run(
                 """
-                MATCH (website:Website)-[:HAS_CHUNK]->(chunk:Chunk)
-                MATCH (chunk)-[:MENTIONS]->(entity:Entity)
-                WHERE website.id IN $website_ids
+                MATCH (chunk:Chunk)-[:MENTIONS]->(entity:Entity)
+
+                OPTIONAL MATCH (website:Website)-[:HAS_CHUNK]->(chunk)
+                OPTIONAL MATCH (document:Document)-[:HAS_CHUNK]->(chunk)
+
+                WHERE
+                    (website.id IN $website_ids)
+                    OR
+                    (document.id IN $document_ids)
+
                 RETURN DISTINCT entity.name AS name
                 """,
-                website_ids=website_ids
+                website_ids=website_ids,
+                document_ids=document_ids
             )
 
-            entity_names = [r["name"] for r in result]
+            entity_names = [record["name"] for record in result]
 
         matches = process.extract(
             query,
@@ -241,25 +299,86 @@ class Neo4jClient:
         with self.driver.session() as session:
             result = session.run(
                 """
-                MATCH (website:Website)-[:HAS_CHUNK]->(chunk:Chunk)
-                MATCH (chunk)-[:MENTIONS]->(entity:Entity)
-                WHERE website.id IN $website_ids
-                AND entity.name IN $matched_names
-                RETURN DISTINCT chunk.id AS chunk_id
+                MATCH (chunk:Chunk)-[:MENTIONS]->(entity:Entity)
+                WHERE entity.name IN $matched_names
+                AND (
+                    EXISTS {
+                        MATCH (website:Website)-[:HAS_CHUNK]->(chunk)
+                        WHERE website.id IN $website_ids
+                    }
+                    OR
+                    EXISTS {
+                        MATCH (document:Document)-[:HAS_CHUNK]->(chunk)
+                        WHERE document.id IN $document_ids
+                    }
+                )
+                RETURN chunk.id AS chunk_id, count(entity) AS matches
+                ORDER BY matches DESC
+                LIMIT 5
                 """,
                 website_ids=website_ids,
+                document_ids=document_ids,
                 matched_names=matched_names
             )
 
-            return [r["chunk_id"] for r in result]
+            return [record["chunk_id"] for record in result]
 
-    def create_document_chunk(self, document_id, chunk):
+
+    def get_source_graph(self, website_ids, document_ids):
         with self.driver.session() as session:
-            session.execute_write(
-                self._create_document_chunk,
-                document_id,
-                chunk
+            result = session.run(
+                """
+                MATCH (chunk:Chunk)-[:MENTIONS]->(entity:Entity)
+
+                OPTIONAL MATCH (website:Website)-[:HAS_CHUNK]->(chunk)
+                OPTIONAL MATCH (document:Document)-[:HAS_CHUNK]->(chunk)
+
+                WHERE
+                    website.id IN $website_ids
+                    OR document.id IN $document_ids
+
+                OPTIONAL MATCH (entity)-[r:RELATED_TO]-(related:Entity)
+
+                RETURN
+                    entity.name AS source,
+                    entity.type AS source_type,
+                    type(r) AS relationship,
+                    related.name AS target,
+                    related.type AS target_type
+                """,
+                website_ids=website_ids,
+                document_ids=document_ids
             )
+
+            nodes = {}
+            edges = []
+
+            for record in result:
+                if record["source"]:
+                    nodes[record["source"]] = {
+                        "id": record["source"],
+                        "label": record["source"],
+                        "type": record["source_type"]
+                    }
+
+                if record["target"]:
+                    nodes[record["target"]] = {
+                        "id": record["target"],
+                        "label": record["target"],
+                        "type": record["target_type"]
+                    }
+
+                if record["source"] and record["target"]:
+                    edges.append({
+                        "source": record["source"],
+                        "target": record["target"],
+                        "label": record["relationship"]
+                    })
+
+            return {
+                "nodes": list(nodes.values()),
+                "edges": edges
+            }
 
     @staticmethod
     def _create_document_chunk(tx, document_id, chunk):

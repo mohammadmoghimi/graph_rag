@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from websites.models import Website
+from documents.models import Document
 
 
 class ChatSession(models.Model):
@@ -13,6 +14,10 @@ class ChatSession(models.Model):
     websites = models.ManyToManyField(
         Website,
         through="ChatSessionWebsite"
+    )
+    documents = models.ManyToManyField(
+        Document,
+        through="ChatSessionDocument"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -38,6 +43,27 @@ class ChatSessionWebsite(models.Model):
             models.UniqueConstraint(
                 fields=["chat_session", "website"],
                 name="unique_chat_website"
+            )
+        ]
+
+
+class ChatSessionDocument(models.Model):
+    chat_session = models.ForeignKey(
+        ChatSession,
+        on_delete=models.CASCADE,
+        related_name="chat_documents"
+    )
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.CASCADE,
+        related_name="chat_sessions"
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["chat_session", "document"],
+                name="unique_chat_document"
             )
         ]
 

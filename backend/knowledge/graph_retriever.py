@@ -4,24 +4,24 @@ from .entity_extractor import EntityExtractor
 from .reranker import Reranker
 
 class GraphRetriever:
-    def __init__(self, retriever, website_ids, k=5):
+    def __init__(self, retriever, website_ids, document_ids, k=4):
         self.retriever = retriever
         self.website_ids = website_ids
+        self.document_ids = document_ids
         self.k = k
         self.reranker = Reranker()
 
     def retrieve(self, query):
         elastic_docs = self.retriever.invoke(query)
-        # entities = EntityExtractor().extract(query)
 
         graph = Neo4jClient()
 
         try:
-            # print("QUERY ENTITIES:", entities)
 
             graph_chunk_ids = graph.get_chunks_by_query(
                 query,
-                self.website_ids
+                self.website_ids,
+                self.document_ids
             )
 
             print("GRAPH CHUNK IDS:", graph_chunk_ids)
@@ -71,7 +71,7 @@ class GraphRetriever:
                     "metadata.chunk_id.keyword": chunk_ids
                 }
             },
-            size=len(chunk_ids),
+            size=self.k,
             _source=["text", "metadata"]
         )
 

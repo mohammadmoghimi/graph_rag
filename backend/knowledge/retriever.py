@@ -11,6 +11,7 @@ class ElasticsearchHybridRetriever(BaseRetriever):
     index_name: str
     embedding_model: Any
     website_ids: list[int] = []
+    document_ids: list[int] = []
     text_field: str = "text"
     embedding_field: str = "vector"
     k: int = 4
@@ -35,11 +36,7 @@ class ElasticsearchHybridRetriever(BaseRetriever):
                             "fields": [self.text_field]
                         }
                     },
-                    "filter": {
-                        "terms": {
-                            "metadata.website_id": self.website_ids
-                        }
-                    }
+                    "filter": self._source_filter()
                 }
             },
             "size": self.num_candidates,
@@ -54,13 +51,7 @@ class ElasticsearchHybridRetriever(BaseRetriever):
                 "query_vector": query_vector,
                 "k": self.num_candidates,
                 "num_candidates": self.num_candidates,
-                "filter": [
-                    {
-                        "terms": {
-                            "metadata.website_id": self.website_ids
-                        }
-                    }
-                ]
+                "filter": self._source_filter()
             },
             "size": self.num_candidates,
             "_source": [self.text_field, "metadata"]
@@ -85,7 +76,7 @@ class ElasticsearchHybridRetriever(BaseRetriever):
         for rank, hit in enumerate(knn_hits, 1):
             doc_id = hit["_id"]
             combined_scores[doc_id] = combined_scores.get(doc_id, 0) + (
-                self.bm25_weight / (60 + rank)
+                self.vector_weight / (60 + rank)
             )
             if doc_id not in doc_store:
                 doc_store[doc_id] = {
@@ -105,5 +96,29 @@ class ElasticsearchHybridRetriever(BaseRetriever):
                 )
             )
         return documents
+    
+    def _source_filter(self):
+        filters = []
+
+        if self.website_ids:
+            filters.append({
+                "terms": {
+                    "metadata.website_id": self.website_ids
+                }
+            })
+
+        if self.document_ids:
+            filters.append({
+                "terms": {
+                    "metadata.document_id": self.document_ids
+                }
+            })
+
+        return {
+            "bool": {
+                "should": filters,
+                "minimum_should_match": 1
+            }
+        }
     
     

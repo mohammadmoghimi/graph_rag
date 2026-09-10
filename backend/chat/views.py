@@ -8,6 +8,7 @@ from .models import ChatMessage, ChatSession
 from .serializers import ChatSessionSerializer
 from rest_framework.decorators import action
 from knowledge.guardrail_service import guardrail_service
+from documents.models import Document
 
 class ChatSessionViewSet(viewsets.ModelViewSet):
     serializer_class = ChatSessionSerializer
@@ -18,6 +19,7 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
             user=self.request.user
         ).prefetch_related(
             "websites",
+            "documents",
             "messages"
         )
 
@@ -44,6 +46,10 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
             chat.websites.values_list("id", flat=True)
         )
 
+        document_ids = list(
+            chat.documents.values_list("id", flat=True)
+        )
+
         history = list(
             chat.messages.order_by("created_at").values(
                 "role",
@@ -54,6 +60,7 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
         answer = answer_question(
             question,
             website_ids,
+            document_ids,
             history
         )
 
@@ -76,10 +83,23 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["get"])
     def graph(self, request, pk=None):
         chat = self.get_object()
-        website_ids = list(chat.websites.values_list("id", flat=True))
+
+        website_ids = list(
+            chat.websites.values_list("id", flat=True)
+        )
+
+        document_ids = list(
+            chat.documents.values_list("id", flat=True)
+        )
 
         neo4j_client = Neo4jClient()
-        graph = neo4j_client.get_website_graph(website_ids)
-        neo4j_client.close()
+
+        try:
+            graph = neo4j_client.get_source_graph(
+                website_ids,
+                document_ids
+            )
+        finally:
+            neo4j_client.close()
 
         return Response(graph)

@@ -1,6 +1,4 @@
-from .graph_retriever import GraphRetriever
 from .llm import generate
-
 
 class GraphRAG:
     def __init__(self, retriever):
@@ -9,36 +7,90 @@ class GraphRAG:
     def answer(self, question, history):
         documents = self.retriever.retrieve(question)
 
+        if not documents:
+            return "اطلاعات کافی برای پاسخ به این سؤال پیدا نشد."
+
+        print("\nTOP CHUNK:")
+        print(documents[0].page_content)
+        print()
+
         context = "\n\n".join(
             document.page_content
             for document in documents
         )
 
-        conversation = "\n".join(
-            f"{message['role']}: {message['content']}"
-            for message in history
-        )
-        print('context' , context)
-
-
         prompt = f"""
-You are a precise question-answering assistant focused on the content of a specific website.
-
-Strict Rules:
-1. Base your answer SOLELY on the provided "Context" section below. Do not use your general knowledge, training data, or any information outside this context.
-2. If the context does not explicitly contain the information needed to answer the "Question", or if the context is irrelevant, do not guess, infer beyond clear implications, or invent facts. 
-3. In such cases, respond verbatim with the exact Persian phrase: "اطلاعات کافی برای پاسخ به این سؤال پیدا نشد."
-4. Keep your answer short and to the point, but ensure it fully addresses the question based on the context.
-5. CRITICAL: Your entire response MUST be written in Persian (Farsi). Never use any other language in your reply, regardless of the language used in the question.
-
-Conversation History:
-{conversation}
+Answer the question using the context.
 
 Context:
 {context}
 
+
 Question:
 {question}
+
+Give a short answer in Persian.
+If the answer is present in the context, answer it directly.
+If the context does not contain the answer, say:
+اطلاعات کافی برای پاسخ به این سؤال پیدا نشد.
+
+Answer:
 """
 
         return generate(prompt)
+    
+
+
+
+# from .llm import generate
+
+
+# class GraphRAG:
+#     def __init__(self, retriever):
+#         self.retriever = retriever
+
+#     def answer(self, question, history):
+#         documents = self.retriever.retrieve(question)
+
+#         context = "\n\n".join(
+#             document.page_content
+#             for document in documents
+#         )
+
+#         conversation = "\n".join(
+#             f"{message['role']}: {message['content']}"
+#             for message in history
+#         )
+
+#         print("context:", context)
+
+#         prompt = f"""
+# You are a question-answering assistant for a Retrieval-Augmented Generation system.
+
+# Your task is to answer the user's question using ONLY the information provided in the Context.
+
+# Rules:
+# 1. Carefully read the Context and identify information that answers the Question.
+# 2. The answer does not need to use the exact wording of the Question. Understand the meaning of the Question and find the corresponding information in the Context.
+# 3. You may combine information from different parts of the Context when necessary.
+# 4. Do not use your general knowledge, training knowledge, assumptions, or outside information.
+# 5. If the Context contains enough information to answer the Question, provide the answer.
+# 6. Only if the Context does not contain enough information to answer the Question, respond exactly with:
+# "اطلاعات کافی برای پاسخ به این سؤال پیدا نشد."
+# 7. Keep the answer concise and directly answer the Question.
+# 8. Always answer in Persian (Farsi).
+# 9. Conversation history is provided only to understand the context of the current question. Do not use it as a source of factual information.
+
+# Conversation History:
+# {conversation}
+
+# Context:
+# {context}
+
+# Question:
+# {question}
+
+# Answer:
+# """
+
+#         return generate(prompt)
