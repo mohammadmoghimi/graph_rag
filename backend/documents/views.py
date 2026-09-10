@@ -28,10 +28,18 @@ class DocumentViewSet(viewsets.ModelViewSet):
         serializer = DocumentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        uploaded_file = request.FILES.get("file")
+
+        if not uploaded_file:
+            return Response(
+                {"error": "File is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         document = serializer.save(user=request.user)
 
         try:
-            process_document(document)
+            process_document(document, uploaded_file)
 
         except Exception as error:
             return Response(
@@ -43,11 +51,3 @@ class DocumentViewSet(viewsets.ModelViewSet):
             DocumentSerializer(document).data,
             status=status.HTTP_201_CREATED
         )
-
-    def destroy(self, request, *args, **kwargs):
-        document = self.get_object()
-
-        document.status = "deleted"
-        document.save(update_fields=["status", "updated_at"])
-
-        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -17,7 +17,6 @@ class Document(models.Model):
         related_name="documents"
     )
     name = models.CharField(max_length=255)
-    file = models.FileField(upload_to="documents/")
     description = models.TextField(blank=True)
     status = models.CharField(
         max_length=20,

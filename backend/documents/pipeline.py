@@ -1,9 +1,10 @@
 from langchain_core.documents import Document
 from knowledge.chunker import split_into_chunks
+from .extractor import extract_text
 
 
-def document_to_chunks(document):
-    text = extract_document_text(document)
+def document_to_chunks(document, uploaded_file):
+    text = extract_text(uploaded_file)
 
     if not text.strip():
         raise ValueError("No text could be extracted from the document.")
@@ -28,9 +29,3 @@ def document_to_chunks(document):
         })
 
     return chunks
-
-
-def extract_document_text(document):
-    from .extractor import extract_text
-
-    return extract_text(document.file.path)

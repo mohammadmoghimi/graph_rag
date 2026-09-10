@@ -1,0 +1,126 @@
+<div class="container-fluid py-4" dir="rtl">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">اسناد</h3>
+      <p class="text-muted mb-0">
+        اسناد خود را آپلود و برای جستجوی هوشمند آماده کنید.
+      </p>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="fw-bold mb-3">آپلود سند</h5>
+
+      <div class="mb-3">
+        <label class="form-label">فایل</label>
+        <input
+          type="file"
+          class="form-control"
+          accept=".pdf,.txt"
+          (change)="onFileSelected($event)"
+        >
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">نام</label>
+        <input
+          type="text"
+          class="form-control"
+          [value]="name()"
+          (input)="name.set($any($event.target).value)"
+        >
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">توضیحات</label>
+        <textarea
+          class="form-control"
+          rows="3"
+          [value]="description()"
+          (input)="description.set($any($event.target).value)"
+        ></textarea>
+      </div>
+
+      <button
+        class="btn btn-primary"
+        [disabled]="uploading() || !selectedFile() || !name()"
+        (click)="upload()"
+      >
+        @if (uploading()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          در حال پردازش...
+        } @else {
+          آپلود سند
+        }
+      </button>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+
+      <h5 class="fw-bold mb-3">اسناد شما</h5>
+
+      @if (loading()) {
+        <div class="text-center py-5">
+          <div class="spinner-border"></div>
+        </div>
+      } @else if (documents().length === 0) {
+        <div class="text-center text-muted py-5">
+          هنوز سندی اضافه نشده است.
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>نام</th>
+                <th>وضعیت</th>
+                <th>تاریخ</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (document of documents(); track document.id) {
+                <tr>
+                  <td class="fw-semibold">
+                    {{ document.name }}
+                  </td>
+
+                  <td>
+                    <span
+                      class="badge"
+                      [class.bg-success]="document.status === 'completed'"
+                      [class.bg-danger]="document.status === 'failed'"
+                      [class.bg-warning]="document.status === 'processing'"
+                    >
+                      {{ document.status }}
+                    </span>
+                  </td>
+
+                  <td>
+                    {{ document.created_at | date:'yyyy/MM/dd' }}
+                  </td>
+
+                  <td>
+                    <button
+                      class="btn btn-sm btn-outline-danger"
+                      (click)="deleteDocument(document)"
+                    >
+                      حذف
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+    </div>
+  </div>
+
+</div>

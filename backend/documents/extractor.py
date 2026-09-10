@@ -2,20 +2,20 @@ from pathlib import Path
 from pypdf import PdfReader
 
 
-def extract_text(file_path):
-    extension = Path(file_path).suffix.lower()
+def extract_text(file):
+    extension = Path(file.name).suffix.lower()
 
     if extension == ".pdf":
-        return extract_pdf(file_path)
+        return extract_pdf(file)
 
     if extension == ".txt":
-        return extract_txt(file_path)
+        return extract_txt(file)
 
     raise ValueError("Only PDF and TXT files are supported.")
 
 
-def extract_pdf(file_path):
-    reader = PdfReader(file_path)
+def extract_pdf(file):
+    reader = PdfReader(file)
 
     text = []
 
@@ -28,5 +28,5 @@ def extract_pdf(file_path):
     return "\n".join(text)
 
 
-def extract_txt(file_path):
-    return Path(file_path).read_text(encoding="utf-8")
+def extract_txt(file):
+    return file.read().decode("utf-8")

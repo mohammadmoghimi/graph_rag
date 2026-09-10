@@ -1,5 +1,3 @@
-from django.utils import timezone
-
 from knowledge.embeddings import get_embedding_model
 from knowledge.indexer import index_chunks
 from knowledge.entity_extractor import EntityExtractor
@@ -7,12 +5,12 @@ from knowledge.graph import Neo4jClient
 from .pipeline import document_to_chunks
 
 
-def process_document(document):
+def process_document(document, uploaded_file):
     document.status = "processing"
     document.save(update_fields=["status", "updated_at"])
 
     try:
-        chunks = document_to_chunks(document)
+        chunks = document_to_chunks(document, uploaded_file)
 
         embeddings = get_embedding_model()
         index_chunks(chunks, embeddings)
@@ -24,10 +22,10 @@ def process_document(document):
 
         return chunks
 
-    except Exception as error:
+    except Exception:
         document.status = "failed"
         document.save(update_fields=["status", "updated_at"])
-        raise error
+        raise
 
 
 def build_graph(document, chunks):
