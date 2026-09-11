@@ -10,11 +10,12 @@ import {
 import { Website, WebsiteService } from '../../services/website';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Modal } from "../modal/modal";
 
 @Component({
   selector: 'app-websites',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule],
+  imports: [ReactiveFormsModule, FormsModule, Modal],
   templateUrl: './websites.html',
   styleUrl: './websites.scss'
 })
