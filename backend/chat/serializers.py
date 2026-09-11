@@ -86,27 +86,39 @@ class ChatSessionSerializer(serializers.ModelSerializer):
         document_ids = validated_data.pop("document_ids", [])
 
         user = self.context["request"].user
+        is_admin = user.role.name == "admin"
 
-        websites = Website.objects.filter(
-            id__in=website_ids,
-            user=user,
-            status="completed"
-        )
+        if is_admin:
+            websites = Website.objects.filter(
+                id__in=website_ids,
+                status="completed"
+            )
 
-        documents = Document.objects.filter(
-            id__in=document_ids,
-            user=user,
-            status="completed"
-        )
+            documents = Document.objects.filter(
+                id__in=document_ids,
+                status="completed"
+            )
+        else:
+            websites = Website.objects.filter(
+                id__in=website_ids,
+                user=user,
+                status="completed"
+            )
+
+            documents = Document.objects.filter(
+                id__in=document_ids,
+                user=user,
+                status="completed"
+            )
 
         if websites.count() != len(set(website_ids)):
             raise serializers.ValidationError(
-                "You can only select your own completed websites."
+                "You can only select accessible completed websites."
             )
 
         if documents.count() != len(set(document_ids)):
             raise serializers.ValidationError(
-                "You can only select your own completed documents."
+                "You can only select accessible completed documents."
             )
 
         if not website_ids and not document_ids:
