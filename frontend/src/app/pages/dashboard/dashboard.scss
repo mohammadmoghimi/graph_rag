@@ -848,11 +848,27 @@
   }
 }
 
+// .chat-list {
+//   max-height: 280px;
+//   overflow-y: auto;
+//   padding: 0 0.75rem 0.5rem;
+//   // overflow-y: hidden;
+// }
 .chat-list {
   max-height: 280px;
   overflow-y: auto;
   padding: 0 0.75rem 0.5rem;
-  // overflow-y: hidden;
+
+  /* Firefox */
+  scrollbar-width: none;
+
+  /* IE / old Edge */
+  -ms-overflow-style: none;
+}
+
+/* Chrome, Safari, Edge (Chromium) */
+.chat-list::-webkit-scrollbar {
+  display: none;
 }
 
 .chat-item {
