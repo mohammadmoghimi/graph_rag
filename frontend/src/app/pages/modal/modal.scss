@@ -6,8 +6,11 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #070b18;
+  //   background: #070b18;
   color: white;
+  background: rgba(4, 8, 20, 0.88);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .knowledge-background {
