@@ -15,9 +15,12 @@ class ChatSessionViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return ChatSession.objects.filter(
-            user=self.request.user
-        ).prefetch_related(
+        queryset = ChatSession.objects.all()
+
+        if self.request.user.role.name != "admin":
+            queryset = queryset.filter(user=self.request.user)
+
+        return queryset.prefetch_related(
             "websites",
             "documents",
             "messages"
