@@ -28,10 +28,10 @@
   }
 
   @if (!loading() && dashboard(); as data) {
-    <h2 class="page-title mb-4">آمار داشبورد</h2>
+    <h2 class="page-title mb-4" appReveal="down">آمار داشبورد</h2>
 
     <section>
-      <div class="section-heading">
+      <div class="section-heading" appReveal="up">
         <div>
           <h4>نمای کلی پایگاه دانش</h4>
           <span>وضعیت کلی منابع و داده‌های پردازش‌شده</span>
@@ -40,92 +40,28 @@
       </div>
 
       <div class="row g-3 g-lg-4">
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="stat-card">
-            <i class="bi bi-globe2"></i>
-            <div>
-              <span>وب‌سایت‌ها</span>
-              <strong>{{ data.statistics.websites }}</strong>
+        @for (card of statCards(); track card.label; let i = $index) {
+          <div class="col-12 col-sm-6 col-xl-3" appReveal="up" [revealDelay]="i * 70">
+            <div [class]="'stat-card accent-' + ((i % 8) + 1)" appTilt>
+              <i class="bi" [class]="card.icon"></i>
+              <div>
+                <span>{{ card.label }}</span>
+                <strong
+                  [appCountUp]="card.value"
+                  [countSuffix]="card.suffix"
+                  [countDuration]="1500 + i * 60"
+                ></strong>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="stat-card">
-            <i class="bi bi-file-earmark-text"></i>
-            <div>
-              <span>اسناد</span>
-              <strong>{{ data.statistics.documents }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="stat-card">
-            <i class="bi bi-boxes"></i>
-            <div>
-              <span>چانک‌های وب‌سایت</span>
-              <strong>{{ data.statistics.chunks }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="stat-card">
-            <i class="bi bi-files"></i>
-            <div>
-              <span>چانک‌های اسناد</span>
-              <strong>{{ data.statistics.document_chunks }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="stat-card">
-            <i class="bi bi-diagram-3"></i>
-            <div>
-              <span>موجودیت‌های وب‌سایت</span>
-              <strong>{{ data.statistics.entities }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="stat-card">
-            <i class="bi bi-diagram-2"></i>
-            <div>
-              <span>موجودیت‌های اسناد</span>
-              <strong>{{ data.statistics.document_entities }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="stat-card">
-            <i class="bi bi-file-text"></i>
-            <div>
-              <span>صفحات</span>
-              <strong>{{ totalPages() }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-xl-3">
-          <div class="stat-card">
-            <i class="bi bi-check-circle"></i>
-            <div>
-              <span>موفقیت خزش</span>
-              <strong>{{ crawlSuccessRate() }}%</strong>
-            </div>
-          </div>
-        </div>
+        }
       </div>
     </section>
 
     <div class="row g-3 g-lg-4 mt-4">
       @if (latestWebsite(); as website) {
-        <div class="col-12 col-lg-6">
-          <div class="latest-website-card h-100">
+        <div class="col-12 col-lg-6" appReveal="left">
+          <div class="latest-website-card h-100" appTilt [tiltMax]="5">
             <div class="latest-icon">
               <i class="bi bi-globe2"></i>
             </div>
@@ -145,8 +81,8 @@
       }
 
       @if (latestDocument(); as document) {
-        <div class="col-12 col-lg-6">
-          <div class="latest-website-card h-100">
+        <div class="col-12 col-lg-6" appReveal="right" [revealDelay]="80">
+          <div class="latest-website-card h-100" appTilt [tiltMax]="5">
             <div class="latest-icon document">
               <i class="bi bi-file-earmark-text"></i>
             </div>
@@ -167,7 +103,7 @@
     </div>
 
     <section class="mt-5">
-      <div class="section-heading">
+      <div class="section-heading" appReveal="up">
         <div>
           <h4>تحلیل وب‌سایت‌ها</h4>
           <span>فعالیت و وضعیت خزش منابع وب</span>
@@ -176,7 +112,7 @@
       </div>
 
       <div class="row g-3 g-lg-4">
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-lg-8" appReveal="up">
           <div class="dashboard-card h-100">
             <div class="chart-header">
               <div>
@@ -192,7 +128,7 @@
           </div>
         </div>
 
-        <div class="col-12 col-lg-4">
+        <div class="col-12 col-lg-4" appReveal="up" [revealDelay]="120">
           <div class="dashboard-card h-100">
             <div class="chart-header">
               <div>
@@ -203,12 +139,12 @@
             </div>
 
             <div class="chart-container pie">
-              <canvas #crawlStatusChart></canvas>
+              <canvas id="crawlStatusChart"></canvas>
             </div>
           </div>
         </div>
 
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-6" appReveal="up">
           <div class="dashboard-card">
             <div class="chart-header">
               <div>
@@ -224,7 +160,7 @@
           </div>
         </div>
 
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-6" appReveal="up" [revealDelay]="120">
           <div class="dashboard-card">
             <div class="chart-header">
               <div>
@@ -243,7 +179,7 @@
     </section>
 
     <section class="mt-5">
-      <div class="section-heading">
+      <div class="section-heading" appReveal="up">
         <div>
           <h4>تحلیل اسناد RAG</h4>
           <span>وضعیت و ساختار اسناد واردشده به پایگاه دانش</span>
@@ -252,7 +188,7 @@
       </div>
 
       <div class="row g-3 g-lg-4">
-        <div class="col-12 col-lg-4">
+        <div class="col-12 col-lg-4" appReveal="up">
           <div class="dashboard-card h-100">
             <div class="chart-header">
               <div>
@@ -263,12 +199,12 @@
             </div>
 
             <div class="chart-container pie">
-              <canvas #documentStatusChart></canvas>
+              <canvas id="documentStatusChart"></canvas>
             </div>
           </div>
         </div>
 
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-lg-8" appReveal="up" [revealDelay]="120">
           <div class="dashboard-card h-100">
             <div class="chart-header">
               <div>
@@ -285,7 +221,7 @@
         </div>
       </div>
 
-      <div class="dashboard-card mt-4">
+      <div class="dashboard-card mt-4" appReveal="up">
         <h5>آمار اسناد</h5>
 
         @if (data.document_statistics.length === 0) {
@@ -303,15 +239,11 @@
               </thead>
 
               <tbody>
-                @for (document of data.document_statistics; track document.id) {
-                  <tr>
-                    <td class="document-name">
-                      {{ document.name }}
-                    </td>
+                @for (document of data.document_statistics; track document.id; let i = $index) {
+                  <tr appReveal="right" [revealDelay]="i * 45">
+                    <td class="document-name">{{ document.name }}</td>
 
-                    <td>
-                      {{ document.chunks }}
-                    </td>
+                    <td>{{ document.chunks }}</td>
 
                     <td>
                       @if (document.status === 'completed') {
@@ -323,9 +255,7 @@
                       }
                     </td>
 
-                    <td>
-                      {{ timeAgo(document.created_at) }}
-                    </td>
+                    <td>{{ timeAgo(document.created_at) }}</td>
                   </tr>
                 }
               </tbody>
@@ -337,15 +267,15 @@
 
     <section class="mt-5">
       <div class="row g-3 g-lg-4">
-        <div class="col-12 col-lg-7">
+        <div class="col-12 col-lg-7" appReveal="up">
           <div class="dashboard-card h-100">
             <h5>فعالیت‌های اخیر</h5>
 
             @if (data.recent_activity.length === 0) {
               <p class="empty-state">فعالیتی وجود ندارد.</p>
             } @else {
-              @for (activity of data.recent_activity; track activity.created_at) {
-                <div class="activity-item">
+              @for (activity of data.recent_activity; track activity.created_at; let i = $index) {
+                <div class="activity-item" appReveal="right" [revealDelay]="i * 60">
                   <i
                     class="bi"
                     [class.bi-globe2]="activity.type === 'website'"
@@ -355,10 +285,7 @@
 
                   <div>
                     <span>{{ activity.message }}</span>
-
-                    <small>
-                      {{ timeAgo(activity.created_at) }}
-                    </small>
+                    <small>{{ timeAgo(activity.created_at) }}</small>
                   </div>
                 </div>
               }
@@ -366,7 +293,7 @@
           </div>
         </div>
 
-        <div class="col-12 col-lg-5">
+        <div class="col-12 col-lg-5" appReveal="up" [revealDelay]="120">
           <div class="dashboard-card h-100">
             <h5>وضعیت سیستم</h5>
 
@@ -395,7 +322,7 @@
       </div>
     </section>
 
-    <div class="dashboard-card mt-4">
+    <div class="dashboard-card mt-4" appReveal="up">
       <h5>آمار وب‌سایت‌ها</h5>
 
       @if (data.website_statistics.length === 0) {
@@ -416,16 +343,14 @@
             </thead>
 
             <tbody>
-              @for (website of data.website_statistics; track website.id) {
-                <tr>
+              @for (website of data.website_statistics; track website.id; let i = $index) {
+                <tr appReveal="right" [revealDelay]="i * 45">
                   <td class="document-name">{{ website.name }}</td>
                   <td>{{ website.crawls }}</td>
                   <td>{{ website.pages }}</td>
                   <td>{{ website.chunks }}</td>
                   <td>{{ website.entities }}</td>
-                  <td>
-                    {{ timeAgo(website.last_crawled_at) }}
-                  </td>
+                  <td>{{ timeAgo(website.last_crawled_at) }}</td>
                   <td>{{ website.status }}</td>
                 </tr>
               }
