@@ -3,9 +3,11 @@ from elasticsearch import Elasticsearch
 from knowledge.indexer import ES_URL, INDEX_NAME
 from knowledge.graph import Neo4jClient
 from websites.models import Website , Crawl
+from documents.models import Document
 from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Count
+from chat.models import ChatSession
 
 class DashboardService:
 
@@ -49,40 +51,54 @@ class DashboardService:
         finally:
             graph.close()
 
-    def get_recent_activity(self, websites,documents):
+    def get_recent_activity(self, user, websites, documents):
         website_ids = list(websites.values_list("id", flat=True))
+        document_ids = list(documents.values_list("id", flat=True))
 
         website_activity = Website.objects.filter(
             id__in=website_ids
-        ).values(
-            "id", "name", "created_at", "updated_at"
-        )
+        ).values("id", "name", "created_at")
 
         crawl_activity = Crawl.objects.filter(
             website_id__in=website_ids
         ).select_related("website")
+
+        chat_activity = ChatSession.objects.filter(
+            user=user
+        )
+
+        document_activity = Document.objects.filter(
+            id__in=document_ids
+        )
 
         activities = []
 
         for website in website_activity:
             activities.append({
                 "type": "website",
-                "message": f"Website '{website['name']}' added",
+                "message": f"وب‌سایت «{website['name']}» اضافه شد",
                 "created_at": website["created_at"]
             })
 
         for crawl in crawl_activity:
             activities.append({
                 "type": "crawl",
-                "message": f"Website '{crawl.website.name}' crawled",
+                "message": f"وب‌سایت «{crawl.website.name}» خزش شد",
                 "created_at": crawl.completed_at or crawl.created_at
             })
 
-        for document in documents:
+        for document in document_activity:
             activities.append({
                 "type": "document",
-                "message": f"Document '{document.name}' added",
+                "message": f"سند «{document.name}» اضافه شد",
                 "created_at": document.created_at
+            })
+
+        for chat in chat_activity:
+            activities.append({
+                "type": "chat",
+                "message": f"گفتگوی «{chat.title}» ایجاد شد",
+                "created_at": chat.created_at
             })
 
         activities.sort(

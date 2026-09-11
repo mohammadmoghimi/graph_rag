@@ -49,6 +49,7 @@ class DashboardView(APIView):
                 "document_entities": document_statistics["entities"],
             },
             "recent_activity": service.get_recent_activity(
+                request.user,
                 websites,
                 documents
             ),

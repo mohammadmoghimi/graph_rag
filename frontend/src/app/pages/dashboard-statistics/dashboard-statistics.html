@@ -1,7 +1,5 @@
 <div dir="rtl">
-
   @if (loading()) {
-
     <div class="row g-3 g-lg-4">
       @for (card of [1, 2, 3, 4, 5, 6, 7, 8]; track card) {
         <div class="col-12 col-sm-6 col-xl-3">
@@ -30,7 +28,6 @@
   }
 
   @if (!loading() && dashboard(); as data) {
-
     <h2 class="page-title mb-4">آمار داشبورد</h2>
 
     <section>
@@ -43,7 +40,6 @@
       </div>
 
       <div class="row g-3 g-lg-4">
-
         <div class="col-12 col-sm-6 col-xl-3">
           <div class="stat-card">
             <i class="bi bi-globe2"></i>
@@ -123,28 +119,52 @@
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
-    @if (latestWebsite(); as website) {
-      <div class="latest-website-card mt-4">
-        <div class="latest-icon">
-          <i class="bi bi-globe2"></i>
-        </div>
+    <div class="row g-3 g-lg-4 mt-4">
+      @if (latestWebsite(); as website) {
+        <div class="col-12 col-lg-6">
+          <div class="latest-website-card h-100">
+            <div class="latest-icon">
+              <i class="bi bi-globe2"></i>
+            </div>
 
-        <div class="latest-content">
-          <span class="latest-label">آخرین وب‌سایت خزش‌شده</span>
-          <strong>{{ website.name }}</strong>
-          <small>{{ timeAgo(website.last_crawled_at) }}</small>
-        </div>
+            <div class="latest-content">
+              <span class="latest-label">آخرین وب‌سایت خزش‌شده</span>
+              <strong>{{ website.name }}</strong>
+              <small>{{ timeAgo(website.last_crawled_at) }}</small>
+            </div>
 
-        <div class="latest-status">
-          <i class="bi bi-check-circle-fill"></i>
-          <span>تکمیل شده</span>
+            <div class="latest-status">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>تکمیل شده</span>
+            </div>
+          </div>
         </div>
-      </div>
-    }
+      }
+
+      @if (latestDocument(); as document) {
+        <div class="col-12 col-lg-6">
+          <div class="latest-website-card h-100">
+            <div class="latest-icon document">
+              <i class="bi bi-file-earmark-text"></i>
+            </div>
+
+            <div class="latest-content">
+              <span class="latest-label">آخرین سند پردازش‌شده</span>
+              <strong>{{ document.name }}</strong>
+              <small>{{ timeAgo(document.updated_at) }}</small>
+            </div>
+
+            <div class="latest-status">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>تکمیل شده</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
 
     <section class="mt-5">
       <div class="section-heading">
@@ -156,7 +176,6 @@
       </div>
 
       <div class="row g-3 g-lg-4">
-
         <div class="col-12 col-lg-8">
           <div class="dashboard-card h-100">
             <div class="chart-header">
@@ -220,7 +239,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -234,7 +252,6 @@
       </div>
 
       <div class="row g-3 g-lg-4">
-
         <div class="col-12 col-lg-4">
           <div class="dashboard-card h-100">
             <div class="chart-header">
@@ -266,7 +283,6 @@
             </div>
           </div>
         </div>
-
       </div>
 
       <div class="dashboard-card mt-4">
@@ -275,7 +291,6 @@
         @if (data.document_statistics.length === 0) {
           <p class="empty-state">سندی وجود ندارد.</p>
         } @else {
-
           <div class="table-responsive">
             <table class="table align-middle dashboard-table">
               <thead>
@@ -300,17 +315,11 @@
 
                     <td>
                       @if (document.status === 'completed') {
-                        <span class="status-badge success">
-                          تکمیل شده
-                        </span>
+                        <span class="status-badge success"> تکمیل شده </span>
                       } @else if (document.status === 'processing') {
-                        <span class="status-badge processing">
-                          در حال پردازش
-                        </span>
+                        <span class="status-badge processing"> در حال پردازش </span>
                       } @else {
-                        <span class="status-badge failed">
-                          ناموفق
-                        </span>
+                        <span class="status-badge failed"> ناموفق </span>
                       }
                     </td>
 
@@ -328,7 +337,6 @@
 
     <section class="mt-5">
       <div class="row g-3 g-lg-4">
-
         <div class="col-12 col-lg-7">
           <div class="dashboard-card h-100">
             <h5>فعالیت‌های اخیر</h5>
@@ -336,10 +344,8 @@
             @if (data.recent_activity.length === 0) {
               <p class="empty-state">فعالیتی وجود ندارد.</p>
             } @else {
-
               @for (activity of data.recent_activity; track activity.created_at) {
                 <div class="activity-item">
-
                   <i
                     class="bi"
                     [class.bi-globe2]="activity.type === 'website'"
@@ -354,7 +360,6 @@
                       {{ timeAgo(activity.created_at) }}
                     </small>
                   </div>
-
                 </div>
               }
             }
@@ -367,37 +372,26 @@
 
             <div class="status-item">
               <span>Django API</span>
-              <span
-                class="status"
-                [class.online]="data.system_status.api === 'online'"
-              >
+              <span class="status" [class.online]="data.system_status.api === 'online'">
                 ● {{ data.system_status.api }}
               </span>
             </div>
 
             <div class="status-item">
               <span>Elasticsearch</span>
-              <span
-                class="status"
-                [class.online]="data.system_status.elasticsearch === 'online'"
-              >
+              <span class="status" [class.online]="data.system_status.elasticsearch === 'online'">
                 ● {{ data.system_status.elasticsearch }}
               </span>
             </div>
 
             <div class="status-item">
               <span>Neo4j</span>
-              <span
-                class="status"
-                [class.online]="data.system_status.neo4j === 'online'"
-              >
+              <span class="status" [class.online]="data.system_status.neo4j === 'online'">
                 ● {{ data.system_status.neo4j }}
               </span>
             </div>
-
           </div>
         </div>
-
       </div>
     </section>
 
@@ -407,7 +401,6 @@
       @if (data.website_statistics.length === 0) {
         <p class="empty-state">وب‌سایتی وجود ندارد.</p>
       } @else {
-
         <div class="table-responsive">
           <table class="table align-middle dashboard-table">
             <thead>
@@ -439,9 +432,7 @@
             </tbody>
           </table>
         </div>
-
       }
     </div>
-
   }
 </div>
