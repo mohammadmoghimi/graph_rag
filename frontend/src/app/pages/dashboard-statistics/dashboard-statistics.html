@@ -1,11 +1,12 @@
 <div dir="rtl">
+
   @if (loading()) {
-    <div class="row g-4">
-      @for (card of [1, 2, 3, 4, 5, 6]; track card) {
-        <div class="col-sm-12 col-md-6 col-xl-4">
+
+    <div class="row g-3 g-lg-4">
+      @for (card of [1, 2, 3, 4, 5, 6, 7, 8]; track card) {
+        <div class="col-12 col-sm-6 col-xl-3">
           <div class="skeleton-card">
             <div class="skeleton-icon"></div>
-
             <div class="skeleton-content">
               <div class="skeleton-line small"></div>
               <div class="skeleton-line large"></div>
@@ -15,123 +16,165 @@
       }
     </div>
 
-    <div class="row g-4 mt-2">
-      <div class="col-lg-7">
+    <div class="row g-3 g-lg-4 mt-2">
+      <div class="col-12 col-lg-8">
         <div class="skeleton-panel"></div>
       </div>
 
-      <div class="col-lg-5">
+      <div class="col-12 col-lg-4">
         <div class="skeleton-panel"></div>
       </div>
     </div>
 
-    <div class="skeleton-table mt-4">
-      <div class="skeleton-line title"></div>
-
-      @for (row of [1, 2, 3, 4, 5]; track row) {
-        <div class="skeleton-table-row">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      }
-    </div>
+    <div class="skeleton-table mt-4"></div>
   }
 
   @if (!loading() && dashboard(); as data) {
-    <div dir="rtl">
-      <h2 class="mb-4">آمار داشبورد</h2>
 
-      @if (dashboard()) {
-        <div class="row g-4 justify-content-center">
-          <div class="col-sm-12 col-md-6 col-xl-4">
-            <div class="stat-card">
-              <i class="bi bi-globe2"></i>
-              <div>
-                <span>وب‌سایت‌ها</span>
-                <strong>{{ data.statistics.websites }}</strong>
-              </div>
-            </div>
-          </div>
+    <h2 class="page-title mb-4">آمار داشبورد</h2>
 
-          <div class="col-sm-12 col-md-6 col-xl-4">
-            <div class="stat-card">
-              <i class="bi bi-file-text"></i>
-              <div>
-                <span>قطعه‌ها</span>
-                <strong>{{ data.statistics.chunks }}</strong>
-              </div>
-            </div>
-          </div>
+    <section>
+      <div class="section-heading">
+        <div>
+          <h4>نمای کلی پایگاه دانش</h4>
+          <span>وضعیت کلی منابع و داده‌های پردازش‌شده</span>
+        </div>
+        <i class="bi bi-speedometer2"></i>
+      </div>
 
-          <div class="col-sm-12 col-md-6 col-xl-4">
-            <div class="stat-card">
-              <i class="bi bi-diagram-3"></i>
-              <div>
-                <span>موجودیت‌ها</span>
-                <strong>{{ data.statistics.entities }}</strong>
-              </div>
-            </div>
-          </div>
+      <div class="row g-3 g-lg-4">
 
-          <div class="col-sm-12 col-md-6 col-xl-4">
-            <div class="stat-card">
-              <i class="bi bi-file-earmark-text"></i>
-              <div>
-                <span>صفحات</span>
-                <strong>{{ totalPages() }}</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-sm-12 col-md-6 col-xl-4">
-            <div class="stat-card">
-              <i class="bi bi-check-circle"></i>
-              <div>
-                <span>موفقیت </span>
-                <strong>{{ crawlSuccessRate() }}%</strong>
-              </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <i class="bi bi-globe2"></i>
+            <div>
+              <span>وب‌سایت‌ها</span>
+              <strong>{{ data.statistics.websites }}</strong>
             </div>
           </div>
         </div>
 
-        @if (latestWebsite(); as website) {
-          <div class="latest-website-card mt-4">
-            <div class="latest-icon">
-              <i class="bi bi-globe2"></i>
-            </div>
-
-            <div class="latest-content">
-              <span class="latest-label">آخرین وب‌سایت خزش‌شده</span>
-              <strong>{{ website.name }}</strong>
-              <small>{{ timeAgo(website.last_crawled_at) }}</small>
-            </div>
-
-            <div class="latest-status">
-              <i class="bi bi-check-circle-fill"></i>
-              <span>تکمیل شده</span>
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <i class="bi bi-file-earmark-text"></i>
+            <div>
+              <span>اسناد</span>
+              <strong>{{ data.statistics.documents }}</strong>
             </div>
           </div>
-        }
-        <div class="row">
+        </div>
 
-          <div class="dashboard-card mt-4 col-lg-8">
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <i class="bi bi-boxes"></i>
+            <div>
+              <span>چانک‌های وب‌سایت</span>
+              <strong>{{ data.statistics.chunks }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <i class="bi bi-files"></i>
+            <div>
+              <span>چانک‌های اسناد</span>
+              <strong>{{ data.statistics.document_chunks }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <i class="bi bi-diagram-3"></i>
+            <div>
+              <span>موجودیت‌های وب‌سایت</span>
+              <strong>{{ data.statistics.entities }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <i class="bi bi-diagram-2"></i>
+            <div>
+              <span>موجودیت‌های اسناد</span>
+              <strong>{{ data.statistics.document_entities }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <i class="bi bi-file-text"></i>
+            <div>
+              <span>صفحات</span>
+              <strong>{{ totalPages() }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="stat-card">
+            <i class="bi bi-check-circle"></i>
+            <div>
+              <span>موفقیت خزش</span>
+              <strong>{{ crawlSuccessRate() }}%</strong>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    @if (latestWebsite(); as website) {
+      <div class="latest-website-card mt-4">
+        <div class="latest-icon">
+          <i class="bi bi-globe2"></i>
+        </div>
+
+        <div class="latest-content">
+          <span class="latest-label">آخرین وب‌سایت خزش‌شده</span>
+          <strong>{{ website.name }}</strong>
+          <small>{{ timeAgo(website.last_crawled_at) }}</small>
+        </div>
+
+        <div class="latest-status">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>تکمیل شده</span>
+        </div>
+      </div>
+    }
+
+    <section class="mt-5">
+      <div class="section-heading">
+        <div>
+          <h4>تحلیل وب‌سایت‌ها</h4>
+          <span>فعالیت و وضعیت خزش منابع وب</span>
+        </div>
+        <i class="bi bi-globe2"></i>
+      </div>
+
+      <div class="row g-3 g-lg-4">
+
+        <div class="col-12 col-lg-8">
+          <div class="dashboard-card h-100">
             <div class="chart-header">
               <div>
                 <h5>خزش‌ها در ۷ روز گذشته</h5>
                 <span>تعداد خزش‌های انجام‌شده در هر روز</span>
               </div>
-  
               <i class="bi bi-graph-up"></i>
             </div>
-  
+
             <div class="chart-container">
               <canvas id="crawlChart"></canvas>
             </div>
           </div>
-          <div class="dashboard-card col-lg-4 mt-4">
+        </div>
+
+        <div class="col-12 col-lg-4">
+          <div class="dashboard-card h-100">
             <div class="chart-header">
               <div>
                 <h5>وضعیت خزش‌ها</h5>
@@ -140,121 +183,239 @@
               <i class="bi bi-pie-chart"></i>
             </div>
 
-      <div class="chart-container pie">
-        <canvas #crawlStatusChart></canvas>
-      </div>
-    </div>
+            <div class="chart-container pie">
+              <canvas #crawlStatusChart></canvas>
+            </div>
+          </div>
         </div>
 
-        <div class="row g-4 mt-2">
-          <div class="col-lg-7">
-            <div class="dashboard-card">
-              <h5>فعالیت‌های اخیر</h5>
+        <div class="col-12 col-lg-6">
+          <div class="dashboard-card">
+            <div class="chart-header">
+              <div>
+                <h5>چانک‌ها به تفکیک وب‌سایت</h5>
+                <span>توزیع چانک‌های ایجادشده</span>
+              </div>
+              <i class="bi bi-boxes"></i>
+            </div>
 
-              @if (dashboard()!.recent_activity.length === 0) {
-                <p class="empty-state">فعالیتی وجود ندارد.</p>
-              } @else {
-                @for (activity of dashboard()!.recent_activity; track activity.created_at) {
-                  <div class="activity-item">
-                    <i
-                      class="bi"
-                      [class.bi-globe2]="activity.type === 'website'"
-                      [class.bi-arrow-repeat]="activity.type === 'crawl'"
-                    ></i>
+            <div class="chart-container small">
+              <canvas id="chunksChart"></canvas>
+            </div>
+          </div>
+        </div>
 
-                    <div>
-                      <span>{{ activity.message }}</span>
-                      <small>
-                        {{ activity.created_at | date: 'yyyy/MM/dd HH:mm' }}
-                      </small>
-                    </div>
-                  </div>
+        <div class="col-12 col-lg-6">
+          <div class="dashboard-card">
+            <div class="chart-header">
+              <div>
+                <h5>موجودیت‌ها به تفکیک وب‌سایت</h5>
+                <span>توزیع موجودیت‌های استخراج‌شده</span>
+              </div>
+              <i class="bi bi-diagram-3"></i>
+            </div>
+
+            <div class="chart-container small">
+              <canvas id="entitiesChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="mt-5">
+      <div class="section-heading">
+        <div>
+          <h4>تحلیل اسناد RAG</h4>
+          <span>وضعیت و ساختار اسناد واردشده به پایگاه دانش</span>
+        </div>
+        <i class="bi bi-file-earmark-text"></i>
+      </div>
+
+      <div class="row g-3 g-lg-4">
+
+        <div class="col-12 col-lg-4">
+          <div class="dashboard-card h-100">
+            <div class="chart-header">
+              <div>
+                <h5>وضعیت اسناد</h5>
+                <span>وضعیت پردازش اسناد</span>
+              </div>
+              <i class="bi bi-pie-chart"></i>
+            </div>
+
+            <div class="chart-container pie">
+              <canvas #documentStatusChart></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-8">
+          <div class="dashboard-card h-100">
+            <div class="chart-header">
+              <div>
+                <h5>چانک‌ها به تفکیک سند</h5>
+                <span>تعداد قطعه‌های ایجادشده برای هر سند</span>
+              </div>
+              <i class="bi bi-files"></i>
+            </div>
+
+            <div class="chart-container document-chart">
+              <canvas id="documentChunksChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="dashboard-card mt-4">
+        <h5>آمار اسناد</h5>
+
+        @if (data.document_statistics.length === 0) {
+          <p class="empty-state">سندی وجود ندارد.</p>
+        } @else {
+
+          <div class="table-responsive">
+            <table class="table align-middle dashboard-table">
+              <thead>
+                <tr>
+                  <th>سند</th>
+                  <th>چانک‌ها</th>
+                  <th>وضعیت</th>
+                  <th>تاریخ ایجاد</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                @for (document of data.document_statistics; track document.id) {
+                  <tr>
+                    <td class="document-name">
+                      {{ document.name }}
+                    </td>
+
+                    <td>
+                      {{ document.chunks }}
+                    </td>
+
+                    <td>
+                      @if (document.status === 'completed') {
+                        <span class="status-badge success">
+                          تکمیل شده
+                        </span>
+                      } @else if (document.status === 'processing') {
+                        <span class="status-badge processing">
+                          در حال پردازش
+                        </span>
+                      } @else {
+                        <span class="status-badge failed">
+                          ناموفق
+                        </span>
+                      }
+                    </td>
+
+                    <td>
+                      {{ timeAgo(document.created_at) }}
+                    </td>
+                  </tr>
                 }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="mt-5">
+      <div class="row g-3 g-lg-4">
+
+        <div class="col-12 col-lg-7">
+          <div class="dashboard-card h-100">
+            <h5>فعالیت‌های اخیر</h5>
+
+            @if (data.recent_activity.length === 0) {
+              <p class="empty-state">فعالیتی وجود ندارد.</p>
+            } @else {
+
+              @for (activity of data.recent_activity; track activity.created_at) {
+                <div class="activity-item">
+
+                  <i
+                    class="bi"
+                    [class.bi-globe2]="activity.type === 'website'"
+                    [class.bi-arrow-repeat]="activity.type === 'crawl'"
+                    [class.bi-file-earmark-text]="activity.type === 'document'"
+                  ></i>
+
+                  <div>
+                    <span>{{ activity.message }}</span>
+
+                    <small>
+                      {{ timeAgo(activity.created_at) }}
+                    </small>
+                  </div>
+
+                </div>
               }
-            </div>
-          </div>
-
-          <div class="col-lg-5">
-            <div class="dashboard-card">
-              <h5>وضعیت سیستم</h5>
-
-              <div class="status-item">
-                <span>Django API</span>
-                <span class="status" [class.online]="dashboard()!.system_status.api === 'online'">
-                  ● {{ dashboard()!.system_status.api }}
-                </span>
-              </div>
-
-              <div class="status-item">
-                <span>Elasticsearch</span>
-                <span
-                  class="status"
-                  [class.online]="dashboard()!.system_status.elasticsearch === 'online'"
-                >
-                  ● {{ dashboard()!.system_status.elasticsearch }}
-                </span>
-              </div>
-
-              <div class="status-item">
-                <span>Neo4j</span>
-                <span class="status" [class.online]="dashboard()!.system_status.neo4j === 'online'">
-                  ● {{ dashboard()!.system_status.neo4j }}
-                </span>
-              </div>
-            </div>
+            }
           </div>
         </div>
-      }
-    </div>
 
-    <div class="row g-4 mt-2">
-      <div class="col-lg-6">
-        <div class="dashboard-card">
-          <div class="chart-header">
-            <div>
-              <h5>تعداد چانک‌ها به تفکیک وب‌سایت</h5>
-              <span>توزیع چانک‌های ایجادشده</span>
+        <div class="col-12 col-lg-5">
+          <div class="dashboard-card h-100">
+            <h5>وضعیت سیستم</h5>
+
+            <div class="status-item">
+              <span>Django API</span>
+              <span
+                class="status"
+                [class.online]="data.system_status.api === 'online'"
+              >
+                ● {{ data.system_status.api }}
+              </span>
             </div>
-            <i class="bi bi-boxes"></i>
-          </div>
 
-          <div class="chart-container small">
-            <canvas id="chunksChart"></canvas>
+            <div class="status-item">
+              <span>Elasticsearch</span>
+              <span
+                class="status"
+                [class.online]="data.system_status.elasticsearch === 'online'"
+              >
+                ● {{ data.system_status.elasticsearch }}
+              </span>
+            </div>
+
+            <div class="status-item">
+              <span>Neo4j</span>
+              <span
+                class="status"
+                [class.online]="data.system_status.neo4j === 'online'"
+              >
+                ● {{ data.system_status.neo4j }}
+              </span>
+            </div>
+
           </div>
         </div>
+
       </div>
-
-      <div class="col-lg-6">
-        <div class="dashboard-card">
-          <div class="chart-header">
-            <div>
-              <h5>تعداد موجودیت‌ها به تفکیک وب‌سایت</h5>
-              <span>توزیع موجودیت‌های استخراج‌شده</span>
-            </div>
-            <i class="bi bi-diagram-3"></i>
-          </div>
-
-          <div class="chart-container small">
-            <canvas id="entitiesChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
+    </section>
 
     <div class="dashboard-card mt-4">
       <h5>آمار وب‌سایت‌ها</h5>
 
-      @if (dashboard()!.website_statistics.length === 0) {
+      @if (data.website_statistics.length === 0) {
         <p class="empty-state">وب‌سایتی وجود ندارد.</p>
       } @else {
+
         <div class="table-responsive">
-          <table class="table align-middle">
+          <table class="table align-middle dashboard-table">
             <thead>
               <tr>
                 <th>وب‌سایت</th>
                 <th>خزش‌ها</th>
                 <th>صفحات</th>
-                <th>قطعه‌ها</th>
+                <th>چانک‌ها</th>
                 <th>موجودیت‌ها</th>
                 <th>آخرین خزش</th>
                 <th>وضعیت</th>
@@ -262,20 +423,15 @@
             </thead>
 
             <tbody>
-              @for (website of dashboard()!.website_statistics; track website.id) {
+              @for (website of data.website_statistics; track website.id) {
                 <tr>
-                  <td>{{ website.name }}</td>
+                  <td class="document-name">{{ website.name }}</td>
                   <td>{{ website.crawls }}</td>
                   <td>{{ website.pages }}</td>
                   <td>{{ website.chunks }}</td>
                   <td>{{ website.entities }}</td>
                   <td>
-                    @if (website.last_crawled_at) {
-                      <!-- {{ website.last_crawled_at | date:'yyyy/MM/dd HH:mm' }} -->
-                      {{ timeAgo(website.last_crawled_at) }}
-                    } @else {
-                      -
-                    }
+                    {{ timeAgo(website.last_crawled_at) }}
                   </td>
                   <td>{{ website.status }}</td>
                 </tr>
@@ -283,7 +439,9 @@
             </tbody>
           </table>
         </div>
+
       }
     </div>
+
   }
 </div>

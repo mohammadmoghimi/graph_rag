@@ -11,32 +11,43 @@ Chart.register(...registerables);
   styleUrl: './dashboard-statistics.scss',
 })
 export class DashboardStatistics {
-  dashboard = signal<DashboardData | null>(null);
-  loading = signal(true);
-  crawlChart = signal<Chart | null>(null);
-  chunkChart = signal<Chart | null>(null);
-  entityChart = signal<Chart | null>(null);
-  crawlStatusChart = signal<Chart | null>(null);
-  @ViewChild('crawlStatusChart') crawlStatusCanvas!: ElementRef<HTMLCanvasElement>;
+dashboard = signal<DashboardData | null>(null);
+loading = signal(true);
+
+crawlChart = signal<Chart | null>(null);
+chunkChart = signal<Chart | null>(null);
+entityChart = signal<Chart | null>(null);
+crawlStatusChart = signal<Chart | null>(null);
+documentChunkChart = signal<Chart | null>(null);
+documentStatusChart = signal<Chart | null>(null);
+
+@ViewChild('crawlStatusChart')
+crawlStatusCanvas!: ElementRef<HTMLCanvasElement>;
+
+@ViewChild('documentStatusChart')
+documentStatusCanvas!: ElementRef<HTMLCanvasElement>;
 
   constructor(private dashboardService: DashboardService) {}
 
-  ngOnInit(): void {
-    this.dashboardService.getDashboard().subscribe({
-      next: (data) => {
-        (this.dashboard.set(data), console.log(data, 'data'));
-        this.loading.set(false);
-        setTimeout(() => {
-          this.renderCrawlChart();
-          this.renderWebsiteCharts();
-          this.renderCrawlStatusChart()
-        });
-      },
-      error: (err) => {
-        (console.error(err), this.loading.set(false));
-      },
-    });
-  }
+ngOnInit(): void {
+  this.dashboardService.getDashboard().subscribe({
+    next: (data) => {
+      this.dashboard.set(data);
+      this.loading.set(false);
+
+      setTimeout(() => {
+        this.renderCrawlChart();
+        this.renderWebsiteCharts();
+        this.renderCrawlStatusChart();
+        this.renderDocumentCharts();
+      });
+    },
+    error: (err) => {
+      console.error(err);
+      this.loading.set(false);
+    },
+  });
+}
 
   timeAgo(dateString: string | null): string {
     if (!dateString) {
@@ -289,4 +300,92 @@ export class DashboardStatistics {
 
     this.crawlStatusChart.set(chart);
   }
+
+  renderDocumentCharts(): void {
+  const data = this.dashboard();
+
+  if (!data) {
+    return;
+  }
+
+  this.documentChunkChart()?.destroy();
+  this.documentStatusChart()?.destroy();
+
+  const chunkCanvas = document.getElementById(
+    'documentChunksChart'
+  ) as HTMLCanvasElement;
+
+  const labels = data.document_statistics.map(
+    (document) => document.name
+  );
+
+  this.documentChunkChart.set(
+    new Chart(chunkCanvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Chunks',
+            data: data.document_statistics.map(
+              (document) => document.chunks
+            ),
+            borderRadius: 6,
+            barThickness: 18,
+          },
+        ],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+            },
+          },
+        },
+      },
+    })
+  );
+
+  if (!this.documentStatusCanvas) {
+    return;
+  }
+
+  const completed = data.statistics.completed_documents;
+  const failed = data.statistics.failed_documents;
+  const processing = data.statistics.processing_documents;
+
+  this.documentStatusChart.set(
+    new Chart(this.documentStatusCanvas.nativeElement, {
+      type: 'doughnut',
+      data: {
+        labels: ['تکمیل شده', 'ناموفق', 'در حال پردازش'],
+        datasets: [
+          {
+            data: [completed, failed, processing],
+            borderWidth: 0,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+        },
+      },
+    })
+  );
+}
 }

@@ -9,6 +9,12 @@ export interface DashboardStatistics {
   failed_crawls: number;
   chunks: number;
   entities: number;
+  documents: number;
+  completed_documents: number;
+  failed_documents: number;
+  processing_documents: number;
+  document_chunks: number;
+  document_entities: number;
 }
 
 export interface Activity {
@@ -27,6 +33,7 @@ export interface DashboardData {
   statistics: DashboardStatistics;
   crawls_per_day: CrawlDay[];
   website_statistics: WebsiteStatistics[];
+  document_statistics: DocumentStatistics[];
   recent_activity: Activity[];
   system_status: SystemStatus;
 }
@@ -40,6 +47,15 @@ export interface WebsiteStatistics {
   entities: number;
   last_crawled_at: string | null;
   status: string;
+}
+
+export interface DocumentStatistics {
+  id: number;
+  name: string;
+  chunks: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CrawlDay {
