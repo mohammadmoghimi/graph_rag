@@ -49,7 +49,7 @@ class DashboardService:
         finally:
             graph.close()
 
-    def get_recent_activity(self, websites):
+    def get_recent_activity(self, websites,documents):
         website_ids = list(websites.values_list("id", flat=True))
 
         website_activity = Website.objects.filter(
@@ -76,6 +76,13 @@ class DashboardService:
                 "type": "crawl",
                 "message": f"Website '{crawl.website.name}' crawled",
                 "created_at": crawl.completed_at or crawl.created_at
+            })
+
+        for document in documents:
+            activities.append({
+                "type": "document",
+                "message": f"Document '{document.name}' added",
+                "created_at": document.created_at
             })
 
         activities.sort(
@@ -213,3 +220,105 @@ class DashboardService:
             }
             for i in range(7)
         ]
+    
+    def get_document_statistics(self, documents):
+        document_ids = list(documents.values_list("id", flat=True))
+
+        if not document_ids:
+            return {
+                "documents": 0,
+                "completed_documents": 0,
+                "failed_documents": 0,
+                "processing_documents": 0,
+                "chunks": 0,
+                "entities": 0
+            }
+
+        client = Elasticsearch(ES_URL)
+
+        response = client.count(
+            index=INDEX_NAME,
+            query={
+                "terms": {
+                    "metadata.document_id": document_ids
+                }
+            }
+        )
+
+        chunk_count = response["count"]
+        client.close()
+
+        graph = Neo4jClient()
+
+        try:
+            with graph.driver.session() as session:
+                result = session.run(
+                    """
+                    MATCH (document:Document)-[:HAS_CHUNK]->(:Chunk)-[:MENTIONS]->(entity:Entity)
+                    WHERE document.id IN $document_ids
+                    RETURN count(DISTINCT entity) AS count
+                    """,
+                    document_ids=document_ids
+                )
+
+                entity_count = result.single()["count"]
+        finally:
+            graph.close()
+
+        return {
+            "documents": len(document_ids),
+            "completed_documents": documents.filter(status="completed").count(),
+            "failed_documents": documents.filter(status="failed").count(),
+            "processing_documents": documents.filter(
+                status="processing"
+            ).count(),
+            "chunks": chunk_count,
+            "entities": entity_count
+        }
+    
+    def get_document_statistics_per_document(self, documents):
+        document_ids = list(documents.values_list("id", flat=True))
+
+        if not document_ids:
+            return []
+
+        client = Elasticsearch(ES_URL)
+
+        response = client.search(
+            index=INDEX_NAME,
+            size=0,
+            query={
+                "terms": {
+                    "metadata.document_id": document_ids
+                }
+            },
+            aggs={
+                "documents": {
+                    "terms": {
+                        "field": "metadata.document_id",
+                        "size": len(document_ids)
+                    }
+                }
+            }
+        )
+
+        chunk_counts = {
+            bucket["key"]: bucket["doc_count"]
+            for bucket in response["aggregations"]["documents"]["buckets"]
+        }
+
+        client.close()
+
+        result = []
+
+        for document in documents:
+            result.append({
+                "id": document.id,
+                "name": document.name,
+                "chunks": chunk_counts.get(document.id, 0),
+                "status": document.status,
+                "created_at": document.created_at,
+                "updated_at": document.updated_at
+            })
+
+        return result
