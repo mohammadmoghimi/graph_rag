@@ -12,7 +12,7 @@ Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard-statistics',
-  imports: [DatePipe, RevealDirective, CountUpDirective, TiltDirective],
+  imports: [RevealDirective, CountUpDirective, TiltDirective],
   templateUrl: './dashboard-statistics.html',
   styleUrl: './dashboard-statistics.scss',
 })

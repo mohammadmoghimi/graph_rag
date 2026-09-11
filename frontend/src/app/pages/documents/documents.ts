@@ -8,7 +8,7 @@ import { Modal } from '../modal/modal';
 
 @Component({
   selector: 'app-documents',
-  imports: [DatePipe, FormsModule , Modal],
+  imports: [FormsModule , Modal],
   templateUrl: './documents.html',
   styleUrl: './documents.scss',
 })
