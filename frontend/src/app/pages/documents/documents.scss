@@ -1,37 +1,97 @@
-.website-page {
-  max-width: 1200px;
+@use '../theme' as *;
+
+// ════════════════════════════════════════════════════════════════════════
+// 📄 DOCUMENTS — knowledge-base document cards
+// ════════════════════════════════════════════════════════════════════════
+
+@include bootstrap-theme;
+@include kf-fade-up;
+
+:host { font-family: $font-sans; }
+
+.website-page { max-width: 1200px; }
+
+h2.fw-semibold {
+  @include gradient-text;
+  font-weight: 800 !important;
 }
 
-.form-control:focus {
-  box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .1);
+// Icon chips (bg-primary bg-opacity-10 text-primary rounded-3)
+.bg-primary.bg-opacity-10 {
+  background: $gradient-primary-soft !important;
+  color: $purple !important;
+  transition: transform .3s $ease-spring;
+}
+
+.card:hover .bg-primary.bg-opacity-10,
+.card-body:hover .bg-primary.bg-opacity-10 {
+  transform: scale(1.08) rotate(-3deg);
 }
 
 .card {
-  transition: transform .2s ease, box-shadow .2s ease;
+  animation: fadeUp .4s $ease-out both;
 }
 
-.website-card{
+.website-card {
   cursor: pointer;
-  transition: transform 0.25s, 
-  box-shadow 0.25s ease;
+  transition: transform .3s $ease-out, box-shadow .3s $ease-out, background-color .3s $ease-out;
   border-radius: inherit;
-}
+  position: relative;
 
-.website-card:hover {
-  transform: translateY(-4px); 
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); 
-  background-color: rgba(0, 0, 0, 0.01);
-}
-
-.website-card:hover {
-  transform: translateY(-2px);
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $shadow-md;
+    background-color: rgba($purple, .015);
+  }
 }
 
 .website-card.selected {
-  background-color: rgba(25, 135, 84, .1);
-  box-shadow: 0 0 0 2px rgba(25, 135, 84, .25);
+  background: $gradient-primary-soft;
+  box-shadow: 0 0 0 2px rgba($purple, .35), $glow-purple;
 }
 
 .website-card.selected:hover {
-  background-color: rgba(25, 135, 84, .15);
+  background: linear-gradient(135deg, rgba($cyan, .16), rgba($purple, .14), rgba($pink, .1));
+}
+
+.card.border-primary {
+  border-color: transparent !important;
+  box-shadow: 0 0 0 2px rgba($purple, .4), $glow-purple !important;
+}
+
+.card.border-danger {
+  border-color: transparent !important;
+  box-shadow: 0 0 0 2px rgba($rose, .35) !important;
+}
+
+.text-success.fw-semibold {
+  color: $emerald !important;
+}
+
+.btn.rounded-pill.btn-lg {
+  @include btn-gradient;
+  animation: fadeUp .4s $ease-spring both;
+
+  &:hover:not(:disabled) { transform: translateY(-4px) scale(1.02); }
+}
+
+.btn-sm.rounded-circle {
+  transition: all .25s $ease-spring;
+
+  &:hover {
+    transform: translateY(-2px) scale(1.08);
+    box-shadow: $shadow-sm;
+  }
+}
+
+.btn-sm.rounded-circle.text-danger:hover {
+  background: rgba($rose, .12) !important;
+  color: #dc2626 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .website-card, .btn.rounded-pill.btn-lg {
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
 }

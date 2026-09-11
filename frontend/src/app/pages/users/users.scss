@@ -1,0 +1,60 @@
+@use '../theme' as *;
+
+// ════════════════════════════════════════════════════════════════════════
+// 👥 USERS — admin table
+// ════════════════════════════════════════════════════════════════════════
+
+@include bootstrap-theme;
+@include kf-fade-up;
+
+:host { font-family: $font-sans; }
+
+h2.fw-bold {
+  @include gradient-text;
+  font-weight: 800 !important;
+}
+
+.card {
+  border-radius: $radius-lg;
+  animation: fadeUp .4s $ease-out both;
+  overflow: hidden;
+}
+
+.table {
+  margin-bottom: 0;
+
+  thead.table-primary {
+    background: $gradient-primary !important;
+
+    th {
+      background: transparent !important;
+      color: #fff !important;
+      font-weight: 700;
+      border: none;
+      padding: 14px 16px;
+    }
+  }
+
+  tbody tr {
+    transition: background .2s $ease-smooth;
+
+    &:hover { background: rgba($purple, .04); }
+  }
+
+  td {
+    padding: 14px 16px;
+    color: $text-secondary;
+    vertical-align: middle;
+  }
+
+  .fw-semibold { color: $text-primary; }
+}
+
+.badge.text-bg-primary {
+  background: $gradient-primary !important;
+  box-shadow: $glow-purple;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none !important; }
+}

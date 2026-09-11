@@ -8,7 +8,7 @@
   overflow: hidden;
   //   background: #070b18;
   color: white;
-  background: rgba(4, 8, 20, 0.88);
+  background: rgba(18, 10, 36, 0.86);
   backdrop-filter: blur(1px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -23,8 +23,8 @@
   position: absolute;
   inset: -50%;
   background-image:
-    linear-gradient(rgba(100, 140, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(100, 140, 255, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(167, 139, 250, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(167, 139, 250, 0.08) 1px, transparent 1px);
   background-size: 50px 50px;
   transform: perspective(500px) rotateX(60deg);
   animation: gridMove 8s linear infinite;
@@ -34,7 +34,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  border: 1px solid rgba(110, 150, 255, 0.15);
+  border: 1px solid rgba(196, 156, 255, 0.18);
   border-radius: 50%;
   transform: translate(-50%, -50%);
 }
@@ -63,8 +63,8 @@
   position: absolute;
   width: 180px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #638cff, transparent);
-  filter: drop-shadow(0 0 8px #638cff);
+  background: linear-gradient(90deg, transparent, #a78bfa, transparent);
+  filter: drop-shadow(0 0 8px #a78bfa);
   opacity: 0;
   animation: stream 2.5s linear infinite;
 }
@@ -128,7 +128,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: rgba(80, 120, 255, 0.35);
+  background: rgba(168, 100, 253, 0.4);
   filter: blur(30px);
   animation: pulse 2s ease-in-out infinite;
 }
@@ -139,12 +139,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(150, 180, 255, 0.8);
+  border: 1px solid rgba(216, 180, 254, 0.85);
   border-radius: 50%;
-  background: radial-gradient(circle, #2949a0, #101a3c 70%);
+  background: radial-gradient(circle, #a855f7, #ec4899 45%, #1e1240 85%);
   box-shadow:
-    0 0 25px rgba(90, 130, 255, 0.7),
-    inset 0 0 20px rgba(120, 160, 255, 0.4);
+    0 0 25px rgba(139, 92, 246, 0.7),
+    inset 0 0 20px rgba(236, 72, 153, 0.35);
   animation: corePulse 2s ease-in-out infinite;
 }
 
@@ -159,7 +159,7 @@ h3 {
 
 .subtitle {
   margin-bottom: 35px;
-  color: #9da9c7;
+  color: #b9b3d6;
 }
 
 .pipeline {
@@ -176,13 +176,13 @@ h3 {
   align-items: center;
   gap: 8px;
   min-width: 75px;
-  color: #66708d;
+  color: #8178a3;
   font-size: 12px;
   transition: 0.4s;
 }
 
 .pipeline-item.active {
-  color: #dce5ff;
+  color: #ede9fe;
 }
 
 .status-icon {
@@ -191,17 +191,17 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #293452;
+  border: 1px solid #392c5c;
   border-radius: 50%;
-  background: #10172b;
+  background: #1e1638;
   font-size: 17px;
   transition: 0.4s;
 }
 
 .pipeline-item.active .status-icon {
-  border-color: #638cff;
+  border-color: #a78bfa;
   color: #91b0ff;
-  box-shadow: 0 0 15px rgba(99, 140, 255, 0.35);
+  box-shadow: 0 0 15px rgba(167, 139, 250, 0.4);
   animation: iconPulse 2s ease-in-out infinite;
 }
 
@@ -228,7 +228,7 @@ h3 {
 .pipeline-line {
   width: 25px;
   height: 1px;
-  background: linear-gradient(90deg, #293452, #638cff, #293452);
+  background: linear-gradient(90deg, #392c5c, #a78bfa, #392c5c);
   animation: linePulse 2s ease-in-out infinite;
 }
 
@@ -243,7 +243,7 @@ h3 {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #638cff;
+  background: #a78bfa;
   animation: dot 1.2s ease-in-out infinite;
 }
 

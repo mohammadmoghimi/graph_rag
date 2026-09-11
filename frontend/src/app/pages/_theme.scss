@@ -1,0 +1,315 @@
+// ════════════════════════════════════════════════════════════════════════
+// 🎨 AURORA DAY — Shared Design System
+// One palette, one set of mixins, imported by every component so the whole
+// app feels like a single, harmonious, modern product.
+//
+// Usage in a component .scss file:
+//   @use '../theme' as *;
+// ════════════════════════════════════════════════════════════════════════
+
+// ---- Core palette (soft, bright, day-mode) --------------------------------
+$bg-app:        #f7f6fc;
+$bg-app-alt:    #fbf9ff;
+$surface:       #ffffff;
+$surface-soft:  #f8f8fd;
+$border-soft:   #eae8f6;
+$border-softer: #f1f0fa;
+
+$text-primary:   #1e1b2e;
+$text-secondary: #4b4763;
+$text-muted:     #8b87a3;
+$text-dim:       #a9a5c1;
+
+// Vivid accents
+$cyan:    #00b8d4;
+$teal:    #00c9a7;
+$purple:  #7c3aed;
+$violet:  #8b5cf6;
+$pink:    #ec4899;
+$amber:   #f59e0b;
+$blue:    #2563eb;
+$emerald: #10b981;
+$rose:    #f43f5e;
+
+$primary:      $purple;
+$primary-dark: #6d28d9;
+
+$gradient-primary:      linear-gradient(135deg, $cyan 0%, $purple 55%, $pink 100%);
+$gradient-primary-soft: linear-gradient(135deg, rgba($cyan, .12), rgba($purple, .1), rgba($pink, .08));
+$gradient-warm:         linear-gradient(135deg, $amber, $pink);
+$gradient-cool:         linear-gradient(135deg, $cyan, $teal);
+$gradient-violet:       linear-gradient(135deg, $violet, $purple);
+
+// ---- Scale ------------------------------------------------------------
+$radius-lg:   18px;
+$radius-md:   14px;
+$radius-sm:   10px;
+$radius-pill: 999px;
+
+$shadow-sm: 0 2px 10px rgba(30, 27, 46, .05);
+$shadow-md: 0 10px 26px rgba(30, 27, 46, .08);
+$shadow-lg: 0 20px 48px rgba(30, 27, 46, .12);
+
+$glow-purple: 0 10px 26px rgba(124, 58, 237, .2);
+$glow-cyan:   0 10px 26px rgba(0, 184, 212, .2);
+$glow-pink:   0 10px 26px rgba(236, 72, 153, .2);
+$glow-teal:   0 10px 26px rgba(0, 201, 167, .2);
+$glow-amber:  0 10px 26px rgba(245, 158, 11, .2);
+
+$ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+$ease-smooth: cubic-bezier(.4, 0, .2, 1);
+$ease-out:    cubic-bezier(.22, 1, .36, 1);
+
+$font-sans: 'Vazirmatn', 'Segoe UI', Tahoma, -apple-system, BlinkMacSystemFont, sans-serif;
+
+// A small rotation of accent colors, handy for coloring a list of icons/cards
+// in sequence so a grid doesn't look monotone.
+$accent-rotation: $cyan, $purple, $pink, $teal, $amber, $blue, $violet, $rose;
+
+@function accent-color($i) {
+  @return nth($accent-rotation, (($i - 1) % length($accent-rotation)) + 1);
+}
+
+// ---- Shared keyframes (duplicated per-file by design, harmless) ----------
+@mixin kf-fade-up {
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@mixin kf-shimmer {
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+}
+
+@mixin kf-float {
+  @keyframes floatY {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+}
+
+@mixin kf-pulse-dot {
+  @keyframes pulseDot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, .45); }
+    70%      { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  }
+}
+
+// ---- Mixins ---------------------------------------------------------------
+
+// Soft, colorful blob backdrop for full-page canvases (day-mode friendly).
+@mixin lively-canvas {
+  background:
+    radial-gradient(ellipse 60% 45% at 12% 8%, rgba($cyan, .10), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 90% 12%, rgba($pink, .10), transparent 55%),
+    radial-gradient(ellipse 50% 45% at 50% 100%, rgba($purple, .08), transparent 55%),
+    $bg-app;
+}
+
+@mixin card-surface {
+  background: $surface;
+  border: 1px solid $border-soft;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  transition: transform .35s $ease-out, box-shadow .35s $ease-out, border-color .35s $ease-out;
+}
+
+@mixin card-hover-lift($shadow: $shadow-md, $color: $purple) {
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow;
+    border-color: rgba($color, .2);
+  }
+}
+
+@mixin gradient-text($gradient: $gradient-primary) {
+  background: $gradient;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@mixin focus-ring($color: $purple) {
+  &:focus {
+    outline: none;
+    border-color: $color;
+    box-shadow: 0 0 0 4px rgba($color, .15);
+  }
+}
+
+@mixin btn-gradient($gradient: $gradient-primary, $glow: $glow-purple) {
+  background: $gradient;
+  background-size: 180% 180%;
+  background-position: 0 50%;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: $glow;
+  transition: transform .35s $ease-spring, box-shadow .35s $ease-spring, background-position .5s $ease-smooth;
+
+  &:hover:not(:disabled) {
+    background-position: 100% 50%;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(124, 58, 237, .32);
+  }
+  &:active:not(:disabled) { transform: translateY(0) scale(.98); }
+  &:disabled { opacity: .5; box-shadow: none; }
+}
+
+@mixin skeleton-shimmer {
+  background: linear-gradient(100deg, $border-softer 30%, #ffffff 50%, $border-softer 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+// Common Bootstrap component re-skin — include once in any component whose
+// template uses these global classes (btn, card, form-control, badge, ...).
+@mixin bootstrap-theme {
+  .btn {
+    border-radius: $radius-sm;
+    font-weight: 500;
+    letter-spacing: .1px;
+  }
+
+  .btn-primary {
+    @include btn-gradient;
+  }
+
+  .btn-outline-primary {
+    color: $primary;
+    border-color: rgba($primary, .35);
+    background: rgba($purple, .04);
+    transition: all .3s $ease-smooth;
+
+    &:hover {
+      background: $gradient-primary;
+      border-color: transparent;
+      color: #fff;
+      box-shadow: $glow-purple;
+      transform: translateY(-2px);
+    }
+  }
+
+  .btn-outline-success {
+    color: #00856a;
+    border-color: rgba($teal, .4);
+    background: rgba($teal, .04);
+    transition: all .3s $ease-smooth;
+
+    &:hover {
+      background: $gradient-cool;
+      border-color: transparent;
+      color: #fff;
+      box-shadow: $glow-cyan;
+      transform: translateY(-2px);
+    }
+  }
+
+  .btn-light {
+    background: $surface;
+    border: 1px solid $border-soft;
+    color: $text-secondary;
+    transition: all .3s $ease-smooth;
+
+    &:hover {
+      background: $bg-app-alt;
+      color: $primary;
+      border-color: rgba($purple, .25);
+      transform: translateY(-1px);
+      box-shadow: $shadow-sm;
+    }
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, $rose, #dc2626);
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(244, 63, 94, .25);
+    transition: transform .3s $ease-spring, box-shadow .3s $ease-spring;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(244, 63, 94, .35);
+    }
+  }
+
+  .btn-group .btn {
+    border-radius: $radius-sm !important;
+  }
+
+  .form-control,
+  .form-select,
+  textarea.form-control {
+    border: 1.5px solid $border-soft;
+    border-radius: $radius-sm;
+    background: $surface-soft;
+    color: $text-primary;
+    transition: all .3s $ease-smooth;
+
+    &::placeholder { color: $text-dim; }
+    @include focus-ring($purple);
+    &:focus { background: #fff; }
+  }
+
+  .form-label {
+    color: $text-secondary;
+    font-weight: 500;
+  }
+
+  .card {
+    border: 1px solid $border-soft;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    transition: transform .3s $ease-out, box-shadow .3s $ease-out, border-color .3s $ease-out;
+  }
+
+  .badge.text-bg-light {
+    background: $surface-soft !important;
+    color: $text-secondary !important;
+    border: 1px solid $border-soft !important;
+    font-weight: 500;
+    transition: all .25s $ease-spring;
+
+    &:hover { transform: translateY(-1px); box-shadow: $shadow-sm; }
+  }
+
+  .badge.text-bg-primary {
+    background: $gradient-primary !important;
+    box-shadow: $glow-purple;
+  }
+
+  .badge.text-bg-danger {
+    background: linear-gradient(135deg, $rose, #dc2626) !important;
+  }
+
+  .alert-success {
+    background: linear-gradient(135deg, rgba($emerald, .12), rgba($teal, .08));
+    border: 1px solid rgba($emerald, .25);
+    color: darken($emerald, 18%);
+    border-radius: $radius-md;
+  }
+
+  .alert-danger {
+    background: linear-gradient(135deg, rgba($rose, .1), rgba(#dc2626, .06));
+    border: 1px solid rgba($rose, .25);
+    color: #b91c1c;
+    border-radius: $radius-md;
+  }
+
+  .spinner-border.text-primary {
+    color: $purple !important;
+  }
+
+  .modal-content {
+    border-radius: $radius-lg;
+    border: none;
+    box-shadow: $shadow-lg;
+  }
+
+  .modal-header { border-bottom: 1px solid $border-soft; }
+  .modal-footer { border-top: 1px solid $border-soft; }
+}
