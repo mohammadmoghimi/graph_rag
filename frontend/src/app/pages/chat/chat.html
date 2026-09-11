@@ -145,37 +145,41 @@
       </div>
 
       <!-- Input -->
-      <div class="border-top bg-white px-3 px-md-5 py-3">
-        <form class="d-flex gap-2" (ngSubmit)="sendMessage()">
-          <input
-            type="text"
-            class="form-control form-control-lg rounded-4"
-            [(ngModel)]="message"
-            name="message"
-            placeholder="سؤال خود را درباره وب‌سایت‌ها بنویسید..."
-            autocomplete="off"
-            [disabled]="isSending()"
-          />
 
-          <button
-            type="submit"
-            class="btn btn-primary rounded-4 px-4"
-            [disabled]="!message().trim() || isSending()"
-          >
-            @if (isSending()) {
-              <span class="spinner-border spinner-border-sm"></span>
-            } @else {
-              <i class="bi bi-send"></i>
-            }
-          </button>
-        </form>
+      @if (!showGraph()) {
 
-        <div class="text-center mt-2">
-          <small class="text-secondary">
-            پاسخ‌ها بر اساس پایگاه دانش وب‌سایت‌های انتخاب‌شده تولید می‌شوند.
-          </small>
+        <div class="border-top bg-white px-3 px-md-5 py-3">
+          <form class="d-flex gap-2" (ngSubmit)="sendMessage()">
+            <input
+              type="text"
+              class="form-control form-control-lg rounded-4"
+              [(ngModel)]="message"
+              name="message"
+              placeholder="سؤال خود را درباره وب‌سایت‌ها بنویسید..."
+              autocomplete="off"
+              [disabled]="isSending()"
+            />
+  
+            <button
+              type="submit"
+              class="btn btn-primary rounded-4 px-4"
+              [disabled]="!message().trim() || isSending()"
+            >
+              @if (isSending()) {
+                <span class="spinner-border spinner-border-sm"></span>
+              } @else {
+                <i class="bi bi-send"></i>
+              }
+            </button>
+          </form>
+  
+          <div class="text-center mt-2">
+            <small class="text-secondary">
+              پاسخ‌ها بر اساس پایگاه دانش وب‌سایت‌های انتخاب‌شده تولید می‌شوند.
+            </small>
+          </div>
         </div>
-      </div>
+      }
     </div>
   }
 </div>
