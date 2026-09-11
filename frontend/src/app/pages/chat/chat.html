@@ -23,6 +23,12 @@
                   {{ website.name }}
                 </span>
               }
+              @for (document of chat()!.documents; track document.id) {
+                <span class="badge text-bg-light border">
+                  <i class="bi bi-file-earmark-text me-1"></i>
+                  {{ document.name }}
+                </span>
+              }
             </div>
           </div>
 
@@ -104,7 +110,7 @@
                           مرتبط‌ترین بخش
                         </div>
 
-                        <div class=" small text-secondary" style="white-space: pre-wrap">
+                        <div class="small text-secondary" style="white-space: pre-wrap">
                           {{ message.mostRelevantChunk }}
                         </div>
                       </div>

@@ -161,93 +161,125 @@ export class Chat implements OnInit {
     }
   }
 
-  private renderGraph(): void {
+private renderGraph(): void {
+  if (this.cy) {
+    this.cy.destroy();
+    this.cy = null;
+  }
 
-    if (this.cy) {
-      this.cy.destroy();
-      this.cy = null;
-    }
+  const container = this.graphContainer()?.nativeElement;
+  const graph = this.graph();
 
-    const container = this.graphContainer()?.nativeElement;
-    const graph = this.graph();
+  if (!container || !graph) {
+    return;
+  }
 
-    if (!container || !graph) {
-      return;
-    }
+  const nodes = graph.nodes.slice(0, 20);
+  const nodeIds = new Set(nodes.map((node) => node.id));
 
-    const nodes = graph.nodes.slice(0, 20);
-    const nodeIds = new Set(nodes.map((node) => node.id));
+  const edges = Array.from(
+    new Map(
+      graph.edges
+        .filter(
+          (edge) =>
+            nodeIds.has(edge.source) &&
+            nodeIds.has(edge.target)
+        )
+        .map((edge) => {
+          const key = [edge.source, edge.target].sort().join('|');
 
-    const edges = Array.from(
-      new Map(
-        graph.edges
-          .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target))
-          .map((edge) => {
-            const key = [edge.source, edge.target].sort().join('|');
-
-            return [
-              key,
-              {
-                data: {
-                  id: key,
-                  source: edge.source,
-                  target: edge.target,
-                },
+          return [
+            key,
+            {
+              data: {
+                id: key,
+                source: edge.source,
+                target: edge.target,
               },
-            ];
-          }),
-      ).values(),
+            },
+          ];
+        }),
+    ).values(),
+  );
+
+  const degree = new Map<string, number>();
+
+  nodes.forEach((node) => degree.set(node.id, 0));
+
+  edges.forEach((edge) => {
+    degree.set(
+      edge.data.source,
+      (degree.get(edge.data.source) ?? 0) + 1,
     );
 
-    cytoscape({
-      container,
-      elements: [
-        ...nodes.map((node) => ({
-          data: {
-            id: node.id,
-            label: node.label,
-          },
-        })),
-        ...edges,
-      ],
-      style: [
-        {
-          selector: 'node',
-          style: {
-            'background-color': '#0d6efd',
-            label: 'data(label)',
-            color: '#ffffff',
-            'text-valign': 'center',
-            'text-halign': 'center',
-            'font-size': '12px',
-            'font-weight': 'bold',
-            'text-wrap': 'wrap',
-            'text-max-width': '100px',
-            width: '70px',
-            height: '70px',
-            'border-width': 3,
-            'border-color': '#ffffff',
-          },
+    degree.set(
+      edge.data.target,
+      (degree.get(edge.data.target) ?? 0) + 1,
+    );
+  });
+
+  const centerNode = nodes.reduce((highest, node) =>
+    (degree.get(node.id) ?? 0) > (degree.get(highest.id) ?? 0)
+      ? node
+      : highest,
+  );
+
+  this.cy = cytoscape({
+    container,
+    elements: [
+      ...nodes.map((node) => ({
+        data: {
+          id: node.id,
+          label: node.label,
         },
-        {
-          selector: 'edge',
-          style: {
-            width: 2,
-            'line-color': '#adb5bd',
-            'target-arrow-color': '#adb5bd',
-            'target-arrow-shape': 'triangle',
-            'curve-style': 'bezier',
-          },
+      })),
+      ...edges,
+    ],
+
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'background-color': '#0d6efd',
+          label: 'data(label)',
+          color: '#ffffff',
+          'text-valign': 'center',
+          'text-halign': 'center',
+          'font-size': '12px',
+          'font-weight': 'bold',
+          'text-wrap': 'wrap',
+          'text-max-width': '100px',
+          width: '70px',
+          height: '70px',
+          'border-width': 3,
+          'border-color': '#ffffff',
         },
-      ],
-      layout: {
-        name: 'cose',
-        animate: true,
-        padding: 40,
       },
-    });
-    container.style.backgroundColor = '#1e293b';
-  }
+      {
+        selector: 'edge',
+        style: {
+          width: 2,
+          'line-color': '#adb5bd',
+          'target-arrow-color': '#adb5bd',
+          'target-arrow-shape': 'triangle',
+          'curve-style': 'bezier',
+        },
+      },
+    ],
+
+    layout: {
+      name: 'concentric',
+      animate: false,
+      padding: 40,
+      concentric: (node) =>
+        node.id() === centerNode.id ? 2 : 1,
+      levelWidth: () => 1,
+      minNodeSpacing: 80,
+    },
+  });
+
+  container.style.backgroundColor = '#1e293b';
+}
 
   fixNumbers(text: string): string {
     return text.replace(/[۰-۹]+/g, match => match.split('').reverse().join(''));
