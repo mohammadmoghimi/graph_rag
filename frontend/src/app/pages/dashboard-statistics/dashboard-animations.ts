@@ -78,7 +78,7 @@ export class CountUpDirective implements AfterViewInit, OnChanges, OnDestroy {
   @Input() countSuffix = '';
 
   ngAfterViewInit(): void {
-    this.el.nativeElement.textContent = `0${this.countSuffix}`;
+    this.el.nativeElement.textContent = `۰${this.countSuffix}`;
 
     if (typeof IntersectionObserver === 'undefined') {
       this.hasEntered = true;
@@ -109,8 +109,14 @@ export class CountUpDirective implements AfterViewInit, OnChanges, OnDestroy {
     }
   }
 
+  private toPersianDigits(value: string): string {
+    return value.replace(/\d/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)]);
+  }
+
   private animate(): void {
-    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+    }
 
     const target = Number(this.target) || 0;
     const duration = Math.max(200, this.countDuration);
@@ -118,9 +124,13 @@ export class CountUpDirective implements AfterViewInit, OnChanges, OnDestroy {
 
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / duration);
-      const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t); // easeOutExpo
+      const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
       const value = Math.round(target * eased);
-      this.el.nativeElement.textContent = `${value.toLocaleString('en-US')}${this.countSuffix}`;
+
+      const formatted = value.toLocaleString('en-US');
+      const persianValue = this.toPersianDigits(formatted);
+
+      this.el.nativeElement.textContent = `${persianValue}${this.countSuffix}`;
 
       if (t < 1) {
         this.rafId = requestAnimationFrame(tick);
@@ -134,10 +144,12 @@ export class CountUpDirective implements AfterViewInit, OnChanges, OnDestroy {
 
   ngOnDestroy(): void {
     this.observer?.disconnect();
-    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+    }
   }
 }
-
 /**
  * Subtle 3D tilt + cursor spotlight. Publishes CSS vars:
  *   --tilt-x, --tilt-y, --tilt-scale, --mx, --my
